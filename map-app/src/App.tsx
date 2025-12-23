@@ -1,47 +1,32 @@
+import { useEffect } from "react";
+import { useAuth } from "./auth/AuthContext";
+import { LoginPage } from "./pages/LoginPage";
 import { MapView } from "./components/Map/MapView";
 import { useTracker } from "./hooks/useTracker";
 import { useAppContext } from "./context/AppContext";
-import { useEffect } from "react";
 
 export default function App() {
+  const { user, logout } = useAuth();
   const { dispatch } = useAppContext();
   const { startTracking, stopTracking } = useTracker();
 
-  // 🔹 tymczasowa inicjalizacja testowa
+  //synchronizacja AUTH i APP STATE
   useEffect(() => {
-    dispatch({
-      type: "LOGIN",
-      payload: {
-        id: "u1",
-        username: "naganiacz-test",
-        role: "user",
-        reputation: 0,
-      },
-    });
+    if (user) {
+      dispatch({ type: "LOGIN", payload: user });
+    } else {
+      dispatch({ type: "LOGOUT" });
+    }
+  }, [user, dispatch]);
 
-    dispatch({
-      type: "ADD_ACTION",
-      payload: {
-        id: "a1",
-        name: "Testowa naganka",
-        area: [
-          { lat: 52.1, lng: 19.0 },
-          { lat: 52.1, lng: 19.2 },
-          { lat: 52.0, lng: 19.2 },
-          { lat: 52.0, lng: 19.0 },
-        ],
-        createdAt: new Date().toISOString(),
-      },
-    });
-
-    dispatch({ type: "SET_ACTIVE_ACTION", payload: "a1" });
-  }, [dispatch]);
+  if (!user) {
+    return <LoginPage />;
+  }
 
   return (
     <div style={{ height: "100vh", width: "100%" }}>
       <MapView />
 
-      {/* testowe przyciski */}
       <div
         style={{
           position: "absolute",
@@ -53,9 +38,16 @@ export default function App() {
           borderRadius: "6px",
         }}
       >
+        <div>
+          Zalogowany jako: <strong>{user.username}</strong>
+        </div>
+
         <button onClick={startTracking}>Start tracking</button>
         <button onClick={stopTracking} style={{ marginLeft: "8px" }}>
           Stop tracking
+        </button>
+        <button onClick={logout} style={{ marginLeft: "8px" }}>
+          Wyloguj
         </button>
       </div>
     </div>

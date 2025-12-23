@@ -42,4 +42,32 @@ Inne rzeczy nie pokazywane na zajęciach  5%
 
 
 
-Wymagania specyficzne dla tego projektu Wrapper silnika mapy Implementacja komponentu, który "opakowuje" zewnętrzną bibliotekę map, pozwalając na sterowanie nią za pomocą propsów i stanu aplikacji. Mapa musi reagować na zmiany w aplikacji (np. zmiana centrum, zoom), a aplikacja na zdarzenia z mapy. 7% Symulacja tożsamości (Auth) System logowania oparty na pamięci lokalnej. Aplikacja musi rozróżniać, kto jest autorem znacznika na mapie, aby pozwolić na jego edycję tylko właścicielowi. Stan zalogowania musi być trwały. 5% Zarządzanie obiektami przestrzennymi (CRUD) Rozbudowany formularz dodawania punktu na mapie. Musi obsługiwać pobieranie współrzędnych z kliknięcia na mapie, dodawanie metadanych (tytuł, opis) oraz multimediów (zdjęcia). Dane te są zapisywane w lokalnej strukturze danych. 7% Algorytmy filtrowania przestrzennego Implementacja funkcji matematycznej (np. wzór Haversine'a), która w czasie rzeczywistym filtruje tablicę punktów, wyświetlając tylko te, które znajdują się w określonym promieniu od użytkownika lub w widocznym obszarze mapy. 6% Symulacja interakcji społecznych System komentarzy i ocen przypisanych do konkretnego punktu na mapie. Dane te muszą być powiązane relacyjnie (po ID punktu) i dynamicznie obliczać średnią ocenę wyświetlaną w dymku znacznika. 5% Grupowanie danych (Klastry/Warstwy) Mechanizm pozwalający na tworzenie tematycznych kolekcji punktów (np. "Restauracje", "Zabytki") i przełączanie ich widoczności na mapie. Zaznaczenie checkboxa "Pokaż zabytki" powinno natychmiast nanieść odpowiednie znaczniki 4% Geolokalizacja i trasowanie (Math) Wykorzystanie API przeglądarki do pobrania pozycji użytkownika oraz implementacja prostego algorytmu rysującego linię prostą (wektor) pomiędzy pozycją gracza a wybranym celem, z obliczeniem dystansu w metrach/kilometrach. 4% Moderacja treści Panel administracyjny z widokiem tabelarycznym wszystkich punktów. Administrator ma prawo usunąć dowolny znacznik lub edytować jego treść. Zmiana ta musi natychmiast zniknąć znacznik z mapy głównej. 5% Logika reputacji System naliczania punktów za aktywność (np. +10 pkt za dodanie miejsca). Zdobycie określonej liczby punktów powinno odblokowywać wizualne wyróżnienia awatara użytkownika (np. ramka, ikona). 4% Obsługa trybu Offline (Storage) Mechanizm zapisywania fragmentu danych (np. "Ulubione miejsca") w trwałej pamięci przeglądarki, tak aby po odłączeniu internetu (symulowanym) aplikacja nadal wyświetlała listę i szczegóły tych miejsc (bez mapy podkładowej).
+Wymagania specyficzne dla tego projektu
+Wrapper silnika mapy Implementacja komponentu, który "opakowuje" zewnętrzną bibliotekę map,
+pozwalając na sterowanie nią za pomocą propsów i stanu aplikacji.
+Mapa musi reagować na zmiany w aplikacji (np. zmiana centrum, zoom), a aplikacja na zdarzenia z mapy.
+7% Symulacja tożsamości (Auth)
+ System logowania oparty na pamięci lokalnej.
+Aplikacja musi rozróżniać, kto jest autorem znacznika na mapie, aby pozwolić na jego edycję tylko właścicielowi.
+ Stan zalogowania musi być trwały. 5%
+ Zarządzanie obiektami przestrzennymi (CRUD) Rozbudowany formularz dodawania punktu na mapie.
+ Musi obsługiwać pobieranie współrzędnych z kliknięcia na mapie, dodawanie metadanych (tytuł, opis) oraz multimediów (zdjęcia).
+ Dane te są zapisywane w lokalnej strukturze danych. 7%
+
+ Algorytmy filtrowania przestrzennego Implementacja funkcji matematycznej (np. wzór Haversine'a),
+ która w czasie rzeczywistym filtruje tablicę punktów, wyświetlając tylko te,
+ które znajdują się w określonym promieniu od użytkownika lub w widocznym obszarze mapy. 6%
+
+  Symulacja interakcji społecznych System komentarzy i ocen przypisanych do konkretnego punktu na mapie.
+  Dane te muszą być powiązane relacyjnie (po ID punktu) i dynamicznie obliczać średnią ocenę wyświetlaną w dymku znacznika. 5% Grupowanie danych (Klastry/Warstwy) Mechanizm pozwalający na tworzenie tematycznych kolekcji punktów (np. "Restauracje", "Zabytki") i przełączanie ich widoczności na mapie. Zaznaczenie checkboxa "Pokaż zabytki" powinno natychmiast nanieść odpowiednie znaczniki 4% Geolokalizacja i trasowanie (Math)
+
+  Wykorzystanie API przeglądarki do pobrania pozycji użytkownika oraz implementacja prostego algorytmu rysującego linię prostą (wektor)
+  pomiędzy pozycją gracza a wybranym celem, z obliczeniem dystansu w metrach/kilometrach. 4%
+
+  Moderacja treści Panel administracyjny z widokiem tabelarycznym wszystkich punktów.
+   Administrator ma prawo usunąć dowolny znacznik lub edytować jego treść.
+   Zmiana ta musi natychmiast zniknąć znacznik z mapy głównej. 5% Logika reputacji
+
+   System naliczania punktów za aktywność (np. +10 pkt za dodanie miejsca).
+   Zdobycie określonej liczby punktów powinno odblokowywać wizualne wyróżnienia awatara użytkownika (np. ramka, ikona). 4%
+    Obsługa trybu Offline (Storage) Mechanizm zapisywania fragmentu danych (np. "Ulubione miejsca") w trwałej pamięci przeglądarki, tak aby po odłączeniu internetu (symulowanym) aplikacja nadal wyświetlała listę i szczegóły tych miejsc (bez mapy podkładowej).
