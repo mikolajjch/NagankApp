@@ -5,12 +5,15 @@ import { MapView } from "./components/Map/MapView";
 import { useTracker } from "./hooks/useTracker";
 import { useAppContext } from "./context/AppContext";
 
+import { ActionAreaForm } from "./components/ActionArea/ActionAreaForm";
+import { ActionAreaList } from "./components/ActionArea/ActionAreaList";
+
 export default function App() {
   const { user, logout } = useAuth();
   const { dispatch } = useAppContext();
   const { startTracking, stopTracking } = useTracker();
 
-  //synchronizacja AUTH i APP STATE
+  // synchro AUTH, APP STATE
   useEffect(() => {
     if (user) {
       dispatch({ type: "LOGIN", payload: user });
@@ -24,32 +27,70 @@ export default function App() {
   }
 
   return (
-    <div style={{ height: "100vh", width: "100%" }}>
-      <MapView />
+      <div
+    style={{
+      height: "100vh",
+      width: "100%",
+      display: "flex",
+      position: "relative",
+    }}
+  >
+    {/* future SIDEBAR */}
+    <div
+      style={{
+        width: 300,
+        padding: 12,
+        borderRight: "1px solid #ddd",
+        background: "#fff",
+        zIndex: 1000,
+      }}
+    >
+      <div>
+        Zalogowany jako: <strong>{user.username}</strong>
+      </div>
 
+      <hr />
+
+      <ActionAreaForm />
+      <ActionAreaList />
+
+      <hr />
+
+      <button onClick={startTracking}>Zacznij śledzić</button>
+      <button onClick={stopTracking} style={{ marginLeft: 6 }}>
+        Stop
+      </button>
+
+      <hr />
+
+      <button onClick={logout}>Wyloguj</button>
+    </div>
+
+    {/* MAIN */}
+    <div
+      style={{
+        flex: 1,
+        padding: 12,
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
       <div
         style={{
-          position: "absolute",
-          top: 10,
-          left: 10,
-          zIndex: 1000,
-          background: "white",
-          padding: "10px",
-          borderRadius: "6px",
+          height: "60vh",
+          width: "60vh",
+          border: "2px solid #ccc",
+          borderRadius: 8,
+          overflow: "hidden",
         }}
       >
-        <div>
-          Zalogowany jako: <strong>{user.username}</strong>
-        </div>
+        <MapView />
+      </div>
 
-        <button onClick={startTracking}>Start tracking</button>
-        <button onClick={stopTracking} style={{ marginLeft: "8px" }}>
-          Stop tracking
-        </button>
-        <button onClick={logout} style={{ marginLeft: "8px" }}>
-          Wyloguj
-        </button>
+      <div style={{ marginTop: 12 }}>
+        <p>Panel informacyjny</p>
       </div>
     </div>
+  </div>
   );
 }

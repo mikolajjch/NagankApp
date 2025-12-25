@@ -45,9 +45,8 @@ export function MapView() {
       <div
         id="map"
         style={{
-          position: "absolute",
-          inset: 0,
-          zIndex: 0,
+            height: "100%",
+            width: "100%",
         }}
       />
     );
