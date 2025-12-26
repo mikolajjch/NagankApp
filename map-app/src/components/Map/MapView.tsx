@@ -18,6 +18,10 @@ export function MapView() {
     }).addTo(mapRef.current);
 
     layersRef.current = L.layerGroup().addTo(mapRef.current);
+
+    setTimeout(() => {
+        mapRef.current?.invalidateSize();
+    }, 0);
   }, []);
 
   //rysowanie obszarów i śladów
@@ -40,6 +44,24 @@ export function MapView() {
       L.polyline(line, { color: 'red' }).addTo(layersRef.current!);
     });
   }, [state.actions, state.tracks]);
+
+  //centrowanie przy zmianie aktywnej
+  useEffect(() => {
+      if (!mapRef.current) return;
+      if (!state.activeActionId) return;
+
+      const active = state.actions.find(a => a.id === state.activeActionId);
+      if (!active) return;
+      if (active.area.length < 3) return;
+
+      const latLngs = active.area.map(p => L.latLng(p.lat, p.lng));
+      const bounds = L.latLngBounds(latLngs);
+
+      mapRef.current.fitBounds(bounds, {
+          padding: [30, 30],
+          animate: true,
+          });
+      }, [state.activeActionId, state.actions]);
 
   return (
       <div
