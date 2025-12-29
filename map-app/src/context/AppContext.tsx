@@ -9,9 +9,13 @@ interface AppState {
   actions: ActionArea[];
   tracks: Track[];
   activeActionId: string | null;
+
+  drawingPoints: { lat: number; lng: number }[];
 }
 
 type Action =
+  | { type: "ADD_DRAW_POINT"; payload: { lat: number; lng: number } }
+  | { type: "CLEAR_DRAW_POINTS" }
   | { type: "ADD_ACTION"; payload: ActionArea }
   | { type: "SET_ACTIVE_ACTION"; payload: string }
   | {
@@ -25,10 +29,22 @@ const initialState: AppState = {
   actions: persisted?.actions ?? [],
   tracks: persisted?.tracks ?? [],
   activeActionId: persisted?.activeActionId ?? null,
+
+  drawingPoints: [],
 };
 
 function reducer(state: AppState, action: Action): AppState {
   switch (action.type) {
+    case "ADD_DRAW_POINT":
+      return {
+        ...state,
+        drawingPoints: [...state.drawingPoints, action.payload],
+      };
+    case "CLEAR_DRAW_POINTS":
+      return {
+        ...state,
+        drawingPoints: [],
+      };
     case "ADD_ACTION":
       return { ...state, actions: [...state.actions, action.payload] };
 

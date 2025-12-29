@@ -27,70 +27,77 @@ export default function App() {
   }
 
   return (
-      <div
-    style={{
-      height: "100vh",
-      width: "100%",
-      display: "flex",
-      position: "relative",
-    }}
-  >
-    {/* future SIDEBAR */}
     <div
       style={{
-        width: 300,
-        padding: 12,
-        borderRight: "1px solid #ddd",
-        background: "#fff",
-        zIndex: 1000,
-      }}
-    >
-      <div>
-        Zalogowany jako: <strong>{user.username}</strong>
-      </div>
-
-      <hr />
-
-      <ActionAreaForm />
-      <ActionAreaList />
-
-      <hr />
-
-      <button onClick={startTracking}>Zacznij śledzić</button>
-      <button onClick={stopTracking} style={{ marginLeft: 6 }}>
-        Stop
-      </button>
-
-      <hr />
-
-      <button onClick={logout}>Wyloguj</button>
-    </div>
-
-    {/* MAIN */}
-    <div
-      style={{
-        flex: 1,
-        padding: 12,
+        height: "100vh",
+        width: "100%",
         display: "flex",
-        flexDirection: "column",
+        position: "relative",
       }}
     >
+      {/* future SIDEBAR */}
       <div
         style={{
-          height: "60vh",
-          width: "60vh",
-          border: "2px solid #ccc",
-          borderRadius: 8,
-          overflow: "hidden",
+          width: 300,
+          padding: 12,
+          borderRight: "1px solid #ddd",
+          background: "#fff",
+          zIndex: 1000,
         }}
       >
-        <MapView />
+        <div>
+          Zalogowany jako: <strong>{user.username}</strong>
+        </div>
+
+        <hr />
+
+        <ActionAreaForm />
+        <ActionAreaList />
+
+        <hr />
+
+        <button onClick={startTracking}>Zacznij śledzić</button>
+        <button onClick={stopTracking} style={{ marginLeft: 6 }}>
+          Stop
+        </button>
+
+        <hr />
+
+        <button onClick={logout}>Wyloguj</button>
       </div>
 
-      <div style={{ marginTop: 12 }}>
-        <p>Panel informacyjny</p>
+      {/* MAIN */}
+      <div
+        style={{
+          flex: 1,
+          padding: 12,
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
+        <div
+          style={{
+            height: "80vh",
+            width: "80vh",
+            border: "2px solid #ccc",
+            borderRadius: 8,
+            overflow: "hidden",
+          }}
+        >
+          <MapView />
+        </div>
+
+        <div style={{ marginTop: 12 }}>
+          <p>Panel informacyjny</p>
+
+          <hr />
+          <p>Klikaj by narysować</p>
+          <button onClick={() => dispatch({ type: "CLEAR_DRAW_POINTS" })}>
+            Wyczyść rysowanie
+          </button>
+          <hr />
+        </div>
       </div>
     </div>
-  </div>
   );
 }
