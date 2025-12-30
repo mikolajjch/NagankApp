@@ -21,7 +21,7 @@ export function DrawnActionSave() {
 
   return (
     <div style={{ marginTop: 12 }}>
-      <h4>Rysowana naganka</h4>
+      <h4>Rysuj nagankę na mapie</h4>
 
       <input
         placeholder="Nazwa naganki"

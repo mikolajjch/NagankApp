@@ -11,7 +11,7 @@ export function ActionAreaList() {
     <div style={{ marginBottom: 12 }}>
       <h4>Naganki</h4>
 
-      {state.actions.map(action => (
+      {state.actions.map((action) => (
         <div key={action.id} style={{ marginBottom: 4 }}>
           <strong>{action.name}</strong>
 

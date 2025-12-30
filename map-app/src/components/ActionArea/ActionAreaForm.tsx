@@ -27,7 +27,7 @@ export function ActionAreaForm() {
 
   return (
     <form onSubmit={handleSubmit} style={{ marginBottom: 12 }}>
-      <h4>Dodaj nagankę</h4>
+      <h4>Wpisz współrzędne geograficzne</h4>
 
       <input
         placeholder="Nazwa naganki"

@@ -9,10 +9,13 @@ import { ActionAreaForm } from "./components/ActionArea/ActionAreaForm";
 import { ActionAreaList } from "./components/ActionArea/ActionAreaList";
 import { DrawnActionSave } from "./components/ActionArea/DrawnActionSave";
 
+import { useState } from "react";
+
 export default function App() {
   const { user, logout } = useAuth();
   const { dispatch } = useAppContext();
   const { startTracking, stopTracking } = useTracker();
+  const [drawMode, setDrawMode] = useState(false);
 
   if (!user) {
     return <LoginPage />;
@@ -43,9 +46,23 @@ export default function App() {
 
         <hr />
 
-        <ActionAreaForm />
-        <ActionAreaList />
+        <div style={{ display: "flex", gap: 6 }}>
+          <button onClick={() => setDrawMode(false)}>🧭</button>
+          <button onClick={() => setDrawMode(true)}>✏️</button>
+        </div>
 
+        {!drawMode && <ActionAreaForm />}
+        {drawMode && (
+          <>
+            <DrawnActionSave />
+            <button onClick={() => dispatch({ type: "CLEAR_DRAW_POINTS" })}>
+              Wyczyść rysowanie
+            </button>
+          </>
+        )}
+
+        <hr />
+        <ActionAreaList />
         <hr />
 
         <button onClick={startTracking}>Zacznij śledzić</button>
@@ -82,14 +99,7 @@ export default function App() {
         <div style={{ marginTop: 12 }}>
           <p>Panel informacyjny</p>
 
-          <DrawnActionSave />
-
           <hr />
-
-          <button onClick={() => dispatch({ type: "CLEAR_DRAW_POINTS" })}>
-            Wyczyść rysowanie
-          </button>
-
           <hr />
         </div>
       </div>
