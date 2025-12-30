@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useAppContext } from "../../context/AppContext";
-import type { ActionArea } from "../../types/ActionArea";
+import { createActionArea } from "../../services/actionFactory";
 
 export function ActionAreaForm() {
   const { dispatch } = useAppContext();
@@ -12,18 +12,12 @@ export function ActionAreaForm() {
     e.preventDefault();
 
     // format: lat,lng;lat,lng;lat,lng...
-    const area = points.split(";").map(p => {
+    const area = points.split(";").map((p) => {
       const [lat, lng] = p.split(",").map(Number);
       return { lat, lng };
     });
 
-    const action: ActionArea = {
-      id: crypto.randomUUID(),
-      name,
-      area,
-      createdAt: new Date().toISOString(),
-    };
-
+    const action = createActionArea(name, area);
     dispatch({ type: "ADD_ACTION", payload: action });
     dispatch({ type: "SET_ACTIVE_ACTION", payload: action.id });
 
@@ -38,14 +32,14 @@ export function ActionAreaForm() {
       <input
         placeholder="Nazwa naganki"
         value={name}
-        onChange={e => setName(e.target.value)}
+        onChange={(e) => setName(e.target.value)}
         required
       />
 
       <textarea
         placeholder="lat,lng;lat,lng;lat,lng..."
         value={points}
-        onChange={e => setPoints(e.target.value)}
+        onChange={(e) => setPoints(e.target.value)}
         required
       />
 

@@ -7,20 +7,12 @@ import { useAppContext } from "./context/AppContext";
 
 import { ActionAreaForm } from "./components/ActionArea/ActionAreaForm";
 import { ActionAreaList } from "./components/ActionArea/ActionAreaList";
+import { DrawnActionSave } from "./components/ActionArea/DrawnActionSave";
 
 export default function App() {
   const { user, logout } = useAuth();
   const { dispatch } = useAppContext();
   const { startTracking, stopTracking } = useTracker();
-
-  // synchro AUTH, APP STATE
-  useEffect(() => {
-    if (user) {
-      dispatch({ type: "LOGIN", payload: user });
-    } else {
-      dispatch({ type: "LOGOUT" });
-    }
-  }, [user, dispatch]);
 
   if (!user) {
     return <LoginPage />;
@@ -90,11 +82,14 @@ export default function App() {
         <div style={{ marginTop: 12 }}>
           <p>Panel informacyjny</p>
 
+          <DrawnActionSave />
+
           <hr />
-          <p>Klikaj by narysować</p>
+
           <button onClick={() => dispatch({ type: "CLEAR_DRAW_POINTS" })}>
             Wyczyść rysowanie
           </button>
+
           <hr />
         </div>
       </div>
