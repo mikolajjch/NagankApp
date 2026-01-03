@@ -18,6 +18,7 @@ type Action =
   | { type: "CLEAR_DRAW_POINTS" }
   | { type: "ADD_ACTION"; payload: ActionArea }
   | { type: "SET_ACTIVE_ACTION"; payload: string }
+  | { type: "DELETE_ACTION"; payload: string }
   | {
       type: "ADD_TRACK_POINT";
       payload: { actionId: string; userId: string; point: TrackPoint };
@@ -50,7 +51,14 @@ function reducer(state: AppState, action: Action): AppState {
 
     case "SET_ACTIVE_ACTION":
       return { ...state, activeActionId: action.payload };
-
+    case "DELETE_ACTION":
+      const del_id = action.payload;
+      return {
+        ...state,
+        actions: state.actions.filter((a) => a.id != del_id),
+        activeActionId:
+          state.activeActionId == del_id ? null : state.activeActionId,
+      };
     case "ADD_TRACK_POINT": {
       const { actionId, userId, point } = action.payload;
 
