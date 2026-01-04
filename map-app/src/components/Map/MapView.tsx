@@ -1,6 +1,8 @@
 import { useEffect, useRef } from "react";
 import L from "leaflet";
 import { useAppContext } from "../../context/AppContext";
+import { findNearestPoint } from "../../services/nearestPath";
+import type { Route } from "../../types/Route";
 
 export function MapView() {
   const mapRef = useRef<L.Map | null>(null);
@@ -95,6 +97,39 @@ export function MapView() {
       }).addTo(layersRef.current!);
     }
     ///////////////////
+    //// wektor do najbliższego punkty ścieżki
+    const lastTrack = state.tracks[state.tracks.length - 1];
+    const activeRoute = state.routes.find(
+      (r: Route) => r.actionId === state.activeActionId
+    );
+
+    if (
+      lastTrack &&
+      lastTrack.points.length > 0 &&
+      activeRoute &&
+      activeRoute.points.length > 0
+    ) {
+      const userPos = lastTrack.points[lastTrack.points.length - 1];
+
+      const nearest = findNearestPoint(
+        userPos.lat,
+        userPos.lng,
+        activeRoute.points
+      );
+
+      if (nearest) {
+        L.polyline(
+          [
+            [userPos.lat, userPos.lng],
+            [nearest.point.lat, nearest.point.lng],
+          ],
+          {
+            color: "purple",
+            dashArray: "5",
+          }
+        ).addTo(layersRef.current!);
+      }
+    }
   }, [
     state.actions,
     state.tracks,
