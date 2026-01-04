@@ -3,6 +3,7 @@ import { useAuth } from "../../auth/AuthContext";
 import { useTracker } from "../../hooks/useTracker";
 import { MapView } from "../Map/MapView";
 import { Sidebar } from "./Sidebar";
+import { RouteInfo } from "../Map/RouteInfo";
 
 import "./layout.scss";
 
@@ -25,6 +26,10 @@ export function MainLayout() {
       <main className="layout__main">
         <div className="map-container">
           <MapView />
+        </div>
+        <div className="map-info">
+          <strong>Panel informacyjny</strong>
+          <RouteInfo />
         </div>
       </main>
     </div>
