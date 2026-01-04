@@ -24,7 +24,8 @@ type Action =
       type: "ADD_TRACK_POINT";
       payload: { actionId: string; userId: string; point: TrackPoint };
     }
-  | { type: "SET_DRAW_MODE"; payload: boolean };
+  | { type: "SET_DRAW_MODE"; payload: boolean }
+  | { type: "DELETE_TRACK"; payload: string };
 
 const persisted = loadAppState();
 const initialState: AppState = {
@@ -96,6 +97,11 @@ function reducer(state: AppState, action: Action): AppState {
         ],
       };
     }
+    case "DELETE_TRACK":
+      return {
+        ...state,
+        tracks: state.tracks.filter((t) => t.id !== action.payload),
+      };
 
     default:
       return state;

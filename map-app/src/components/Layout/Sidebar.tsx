@@ -22,9 +22,10 @@ export function Sidebar({
   onStartTracking,
   onStopTracking,
 }: Props) {
-  const { dispatch } = useAppContext();
+  const { state, dispatch } = useAppContext();
   const [drawMode, setDrawMode] = useState(false);
   const { user } = useAuth();
+  const isAdmin = user?.role === "admin";
 
   return (
     <aside className={`sidebar ${open ? "sidebar--open" : ""}`}>
@@ -76,6 +77,17 @@ export function Sidebar({
 
           <button onClick={onStartTracking}>Śledź lokalizacje</button>
           <button onClick={onStopTracking}>Stop</button>
+          {isAdmin && (
+            <button
+              onClick={() => {
+                state.tracks.forEach((t) =>
+                  dispatch({ type: "DELETE_TRACK", payload: t.id })
+                );
+              }}
+            >
+              ❌
+            </button>
+          )}
 
           <hr />
 
