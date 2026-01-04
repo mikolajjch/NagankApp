@@ -1,7 +1,10 @@
 import { useAppContext } from "../../context/AppContext";
+import { useAuth } from "../../auth/AuthContext";
 
 export function ActionAreaList() {
   const { state, dispatch } = useAppContext();
+  const { user } = useAuth();
+  const isAdmin = user?.role === "admin";
 
   if (state.actions.length === 0) {
     return <p>Brak dodanych naganek</p>;
@@ -18,21 +21,23 @@ export function ActionAreaList() {
         >
           <strong>{action.name}</strong>
 
-          <button
-            onClick={() =>
-              dispatch({ type: "DELETE_ACTION", payload: action.id })
-            }
-            style={{
-              marginLeft: 8,
-              color: "red",
-              border: "none",
-              background: "transparent",
-              cursor: "pointer",
-            }}
-            title="Usuń nagankę"
-          >
-            ❌
-          </button>
+          {isAdmin && (
+            <button
+              onClick={() =>
+                dispatch({ type: "DELETE_ACTION", payload: action.id })
+              }
+              style={{
+                marginLeft: 8,
+                color: "red",
+                border: "none",
+                background: "transparent",
+                cursor: "pointer",
+              }}
+              title="Usuń nagankę"
+            >
+              ❌
+            </button>
+          )}
 
           {state.activeActionId === action.id ? (
             <span style={{ marginLeft: 6 }}>(aktywna)</span>
