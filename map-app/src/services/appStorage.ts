@@ -1,5 +1,6 @@
 import type { ActionArea } from "../types/ActionArea";
 import type { Track } from "../types/Track";
+import type { Route } from "../types/Route";
 
 const STORAGE_KEY = "app_state_v1";
 
@@ -7,6 +8,7 @@ export type PersistedAppState = {
   actions: ActionArea[];
   tracks: Track[];
   activeActionId: string | null;
+  routes: Route[];
 };
 
 export function saveAppState(state: PersistedAppState) {

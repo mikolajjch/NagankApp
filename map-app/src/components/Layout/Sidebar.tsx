@@ -60,19 +60,18 @@ export function Sidebar({
 
             <button
               disabled={!state.activeActionId}
-              onClick={() =>
-                dispatch({
-                  type: "SET_ROUTE_DRAW_MODE",
-                  payload: !state.routeDrawMode,
-                })
-              }
+              onClick={() => {
+                setDrawMode(false);
+                dispatch({ type: "SET_DRAW_MODE", payload: false });
+                dispatch({ type: "SET_ROUTE_DRAW_MODE", payload: true });
+              }}
               title="Rysuj ścieżkę"
             >
               🏞
             </button>
           </div>
 
-          {!drawMode && <ActionAreaForm />}
+          {!drawMode && !state.routeDrawMode && <ActionAreaForm />}
 
           {drawMode && (
             <>
@@ -86,6 +85,26 @@ export function Sidebar({
             </>
           )}
 
+          {state.routeDrawMode && (
+            <>
+              <h4>Rysuj ścieżkę na mapie</h4>
+
+              <button
+                onClick={() => dispatch({ type: "SAVE_ROUTE" })}
+                disabled={state.routePoints.length < 2}
+                style={{ width: "100%" }}
+              >
+                Zapisz ścieżkę
+              </button>
+
+              <button
+                onClick={() => dispatch({ type: "CLEAR_ROUTE_POINTS" })}
+                style={{ width: "100%", marginBottom: 6 }}
+              >
+                Wyczyść rysowanie
+              </button>
+            </>
+          )}
           <hr />
 
           <ActionAreaList />

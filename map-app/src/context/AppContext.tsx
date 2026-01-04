@@ -3,6 +3,7 @@ import type { ActionArea } from "../types/ActionArea.ts";
 import type { Track, TrackPoint } from "../types/Track";
 import type { User } from "../types/User";
 import { loadAppState, saveAppState } from "../services/appStorage.ts";
+import type { Route } from "../types/Route.ts";
 
 interface AppState {
   user: User | null;
@@ -46,7 +47,7 @@ const initialState: AppState = {
   drawingPoints: [],
   drawMode: false,
 
-  routes: [],
+  routes: persisted?.routes ?? [],
   routeDrawMode: false,
   routePoints: [],
 };
@@ -159,8 +160,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({
       actions: state.actions,
       tracks: state.tracks,
       activeActionId: state.activeActionId,
+      routes: state.routes,
     });
-  }, [state.actions, state.tracks, state.activeActionId]);
+  }, [state.actions, state.tracks, state.activeActionId, state.routes]);
 
   return (
     <AppContext.Provider value={{ state, dispatch }}>
