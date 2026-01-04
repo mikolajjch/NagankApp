@@ -41,6 +41,12 @@ export function MapView() {
     });
 
     state.tracks.forEach((track) => {
+      const lastPoint = track.points[track.points.length - 1];
+      L.circleMarker([lastPoint.lat, lastPoint.lng], {
+        radius: 10,
+        color: "red",
+        fillColor: "red",
+      }).addTo(layersRef.current!);
       if (track.points.length < 2) return;
 
       const line = track.points.map((p) => [p.lat, p.lng]) as [
