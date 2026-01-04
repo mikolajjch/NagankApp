@@ -35,8 +35,23 @@ export function Sidebar({
       {open && (
         <>
           <div className="sidebar__modes">
-            <button onClick={() => setDrawMode(false)}>🧭</button>
-            <button onClick={() => setDrawMode(true)}>✏️</button>
+            <button
+              onClick={() => {
+                setDrawMode(false);
+                dispatch({ type: "SET_DRAW_MODE", payload: false });
+              }}
+            >
+              🧭
+            </button>
+
+            <button
+              onClick={() => {
+                setDrawMode(true);
+                dispatch({ type: "SET_DRAW_MODE", payload: true });
+              }}
+            >
+              ✏️
+            </button>
           </div>
 
           {!drawMode && <ActionAreaForm />}
@@ -44,7 +59,10 @@ export function Sidebar({
           {drawMode && (
             <>
               <DrawnActionSave />
-              <button onClick={() => dispatch({ type: "CLEAR_DRAW_POINTS" })}>
+              <button
+                onClick={() => dispatch({ type: "CLEAR_DRAW_POINTS" })}
+                style={{ width: "100%", marginBottom: 6 }}
+              >
                 Wyczyść rysowanie
               </button>
             </>

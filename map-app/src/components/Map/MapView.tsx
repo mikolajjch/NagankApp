@@ -93,6 +93,7 @@ export function MapView() {
     const map = mapRef.current;
 
     const onClick = (e: L.LeafletMouseEvent) => {
+      if (!state.drawMode) return;
       dispatch({
         type: "ADD_DRAW_POINT",
         payload: {
@@ -107,7 +108,7 @@ export function MapView() {
     return () => {
       map.off("click", onClick);
     };
-  }, []);
+  }, [state.drawMode]);
 
   return (
     <div

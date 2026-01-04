@@ -11,6 +11,7 @@ interface AppState {
   activeActionId: string | null;
 
   drawingPoints: { lat: number; lng: number }[];
+  drawMode: boolean;
 }
 
 type Action =
@@ -22,7 +23,8 @@ type Action =
   | {
       type: "ADD_TRACK_POINT";
       payload: { actionId: string; userId: string; point: TrackPoint };
-    };
+    }
+  | { type: "SET_DRAW_MODE"; payload: boolean };
 
 const persisted = loadAppState();
 const initialState: AppState = {
@@ -32,6 +34,7 @@ const initialState: AppState = {
   activeActionId: persisted?.activeActionId ?? null,
 
   drawingPoints: [],
+  drawMode: false,
 };
 
 function reducer(state: AppState, action: Action): AppState {
@@ -58,6 +61,11 @@ function reducer(state: AppState, action: Action): AppState {
         actions: state.actions.filter((a) => a.id != del_id),
         activeActionId:
           state.activeActionId == del_id ? null : state.activeActionId,
+      };
+    case "SET_DRAW_MODE":
+      return {
+        ...state,
+        drawMode: action.payload,
       };
     case "ADD_TRACK_POINT": {
       const { actionId, userId, point } = action.payload;

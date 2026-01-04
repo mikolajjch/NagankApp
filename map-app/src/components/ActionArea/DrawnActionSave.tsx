@@ -27,7 +27,6 @@ export function DrawnActionSave() {
         placeholder="Nazwa naganki"
         value={name}
         onChange={(e) => setName(e.target.value)}
-        style={{ width: "100%", marginBottom: 6 }}
       />
 
       <button
