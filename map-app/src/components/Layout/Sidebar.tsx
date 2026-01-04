@@ -40,7 +40,9 @@ export function Sidebar({
               onClick={() => {
                 setDrawMode(false);
                 dispatch({ type: "SET_DRAW_MODE", payload: false });
+                dispatch({ type: "SET_ROUTE_DRAW_MODE", payload: false });
               }}
+              title="Tryb przeglądania"
             >
               🧭
             </button>
@@ -49,9 +51,24 @@ export function Sidebar({
               onClick={() => {
                 setDrawMode(true);
                 dispatch({ type: "SET_DRAW_MODE", payload: true });
+                dispatch({ type: "SET_ROUTE_DRAW_MODE", payload: false });
               }}
+              title="Rysuj nagankę"
             >
               ✏️
+            </button>
+
+            <button
+              disabled={!state.activeActionId}
+              onClick={() =>
+                dispatch({
+                  type: "SET_ROUTE_DRAW_MODE",
+                  payload: !state.routeDrawMode,
+                })
+              }
+              title="Rysuj ścieżkę"
+            >
+              🏞
             </button>
           </div>
 

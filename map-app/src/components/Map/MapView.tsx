@@ -67,7 +67,41 @@ export function MapView() {
         }).addTo(layersRef.current!);
       }
     }
-  }, [state.actions, state.tracks, state.drawingPoints]);
+
+    /////////////////// obsługa ścieżki
+    state.routes.forEach((route) => {
+      if (route.points.length < 2) return;
+
+      const line = route.points.map((p) => [p.lat, p.lng]) as [
+        number,
+        number
+      ][];
+
+      L.polyline(line, {
+        color: "blue",
+        weight: 4,
+      }).addTo(layersRef.current!);
+    });
+
+    if (state.routePoints.length >= 2) {
+      const temp = state.routePoints.map((p) => [p.lat, p.lng]) as [
+        number,
+        number
+      ][];
+
+      L.polyline(temp, {
+        color: "blue",
+        dashArray: "6,6",
+      }).addTo(layersRef.current!);
+    }
+    ///////////////////
+  }, [
+    state.actions,
+    state.tracks,
+    state.drawingPoints,
+    state.routes,
+    state.routePoints,
+  ]);
 
   //centrowanie przy zmianie aktywnej
   useEffect(() => {
@@ -93,14 +127,25 @@ export function MapView() {
     const map = mapRef.current;
 
     const onClick = (e: L.LeafletMouseEvent) => {
-      if (!state.drawMode) return;
-      dispatch({
-        type: "ADD_DRAW_POINT",
-        payload: {
-          lat: e.latlng.lat,
-          lng: e.latlng.lng,
-        },
-      });
+      if (state.drawMode) {
+        dispatch({
+          type: "ADD_DRAW_POINT",
+          payload: {
+            lat: e.latlng.lat,
+            lng: e.latlng.lng,
+          },
+        });
+      }
+
+      if (state.routeDrawMode) {
+        dispatch({
+          type: "ADD_ROUTE_POINT",
+          payload: {
+            lat: e.latlng.lat,
+            lng: e.latlng.lng,
+          },
+        });
+      }
     };
 
     map.on("click", onClick);
@@ -108,7 +153,7 @@ export function MapView() {
     return () => {
       map.off("click", onClick);
     };
-  }, [state.drawMode]);
+  }, [state.drawMode, state.routeDrawMode]);
 
   return (
     <div

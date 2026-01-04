@@ -12,6 +12,10 @@ interface AppState {
 
   drawingPoints: { lat: number; lng: number }[];
   drawMode: boolean;
+
+  routes: Route[];
+  routeDrawMode: boolean;
+  routePoints: { lat: number; lng: number }[];
 }
 
 type Action =
@@ -25,7 +29,12 @@ type Action =
       payload: { actionId: string; userId: string; point: TrackPoint };
     }
   | { type: "SET_DRAW_MODE"; payload: boolean }
-  | { type: "DELETE_TRACK"; payload: string };
+  | { type: "DELETE_TRACK"; payload: string }
+  /////////////
+  | { type: "SET_ROUTE_DRAW_MODE"; payload: boolean }
+  | { type: "ADD_ROUTE_POINT"; payload: { lat: number; lng: number } }
+  | { type: "CLEAR_ROUTE_POINTS" }
+  | { type: "SAVE_ROUTE" };
 
 const persisted = loadAppState();
 const initialState: AppState = {
@@ -36,6 +45,10 @@ const initialState: AppState = {
 
   drawingPoints: [],
   drawMode: false,
+
+  routes: [],
+  routeDrawMode: false,
+  routePoints: [],
 };
 
 function reducer(state: AppState, action: Action): AppState {
@@ -103,6 +116,32 @@ function reducer(state: AppState, action: Action): AppState {
         tracks: state.tracks.filter((t) => t.id !== action.payload),
       };
 
+    ///////////////////////////////// logika ścieżki do przejścia
+    case "SET_ROUTE_DRAW_MODE":
+      return { ...state, routeDrawMode: action.payload };
+    case "ADD_ROUTE_POINT":
+      return {
+        ...state,
+        routePoints: [...state.routePoints, action.payload],
+      };
+    case "CLEAR_ROUTE_POINTS":
+      return { ...state, routePoints: [] };
+    case "SAVE_ROUTE":
+      if (!state.activeActionId || state.routePoints.length < 2) return state;
+      return {
+        ...state,
+        routes: [
+          ...state.routes,
+          {
+            id: crypto.randomUUID(),
+            actionId: state.activeActionId,
+            points: state.routePoints,
+          },
+        ],
+        routePoints: [],
+        routeDrawMode: false,
+      };
+    /////////////////////////////////////
     default:
       return state;
   }
