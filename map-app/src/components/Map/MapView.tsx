@@ -40,6 +40,38 @@ export function MapView() {
       L.polygon(polygon, { color: "green" }).addTo(layersRef.current!);
     });
 
+    if (state.editActionMode && state.activeActionId) {
+      const activeAction = state.actions.find(
+        (a) => a.id === state.activeActionId
+      );
+
+      if (activeAction) {
+        activeAction.area.forEach((point, index) => {
+          const marker = L.marker([point.lat, point.lng], {
+            draggable: true,
+          }).addTo(layersRef.current!);
+
+          marker.on("dragend", (e) => {
+            const latlng = e.target.getLatLng();
+
+            const newArea = [...activeAction.area];
+            newArea[index] = {
+              lat: latlng.lat,
+              lng: latlng.lng,
+            };
+
+            dispatch({
+              type: "UPDATE_ACTION",
+              payload: {
+                actionId: activeAction.id,
+                area: newArea,
+              },
+            });
+          });
+        });
+      }
+    }
+
     state.tracks.forEach((track) => {
       const lastPoint = track.points[track.points.length - 1];
       L.circleMarker([lastPoint.lat, lastPoint.lng], {

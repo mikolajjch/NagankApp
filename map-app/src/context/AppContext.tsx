@@ -10,6 +10,7 @@ interface AppState {
   actions: ActionArea[];
   tracks: Track[];
   activeActionId: string | null;
+  editActionMode: boolean;
 
   drawingPoints: { lat: number; lng: number }[];
   drawMode: boolean;
@@ -22,9 +23,19 @@ interface AppState {
 type Action =
   | { type: "ADD_DRAW_POINT"; payload: { lat: number; lng: number } }
   | { type: "CLEAR_DRAW_POINTS" }
+  ///////// naganki
   | { type: "ADD_ACTION"; payload: ActionArea }
   | { type: "SET_ACTIVE_ACTION"; payload: string }
+  | {
+      type: "UPDATE_ACTION";
+      payload: {
+        actionId: string;
+        area: { lat: number; lng: number }[];
+      };
+    }
+  | { type: "SET_EDIT_ACTION_MODE"; payload: boolean }
   | { type: "DELETE_ACTION"; payload: string }
+  /////////////////
   | {
       type: "ADD_TRACK_POINT";
       payload: { actionId: string; userId: string; point: TrackPoint };
@@ -43,6 +54,7 @@ const initialState: AppState = {
   actions: persisted?.actions ?? [],
   tracks: persisted?.tracks ?? [],
   activeActionId: persisted?.activeActionId ?? null,
+  editActionMode: false,
 
   drawingPoints: [],
   drawMode: false,
@@ -69,6 +81,18 @@ function reducer(state: AppState, action: Action): AppState {
 
     case "SET_ACTIVE_ACTION":
       return { ...state, activeActionId: action.payload };
+    case "UPDATE_ACTION":
+      return {
+        ...state,
+        actions: state.actions.map((a) =>
+          a.id === action.payload.actionId
+            ? { ...a, area: action.payload.area }
+            : a
+        ),
+      };
+    case "SET_EDIT_ACTION_MODE":
+      return { ...state, editActionMode: action.payload };
+
     case "DELETE_ACTION":
       const del_id = action.payload;
       return {

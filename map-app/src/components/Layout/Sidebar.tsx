@@ -35,6 +35,8 @@ export function Sidebar({
 
       {open && (
         <>
+          <h4>Dostępne narzędzia</h4>
+
           <div className="sidebar__modes">
             <button
               onClick={() => {
@@ -56,6 +58,16 @@ export function Sidebar({
               title="Rysuj nagankę"
             >
               ✏️
+            </button>
+
+            <button
+              disabled={!state.activeActionId}
+              onClick={() =>
+                dispatch({ type: "SET_EDIT_ACTION_MODE", payload: true })
+              }
+              title="Edytuj nagankę"
+            >
+              ✋
             </button>
 
             <button
