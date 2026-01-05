@@ -24,6 +24,8 @@ export function MainLayout() {
       />
 
       <main className="layout__main">
+        <header>NagankApp 2000</header>
+
         <div className="map-container">
           <MapView />
         </div>

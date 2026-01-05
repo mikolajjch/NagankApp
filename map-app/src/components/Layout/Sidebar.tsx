@@ -117,32 +117,30 @@ export function Sidebar({
               </button>
             </>
           )}
-          <hr />
 
           <ActionAreaList />
 
-          <hr />
+          <div className="location__panel">
+            <h4>Lokalizacja</h4>
+            <button onClick={onStartTracking}>Śledź lokalizacje</button>
+            <button onClick={onStopTracking}>Stop</button>
+            {isAdmin && (
+              <button
+                onClick={() => {
+                  state.tracks.forEach((t) =>
+                    dispatch({ type: "DELETE_TRACK", payload: t.id })
+                  );
+                }}
+              >
+                ❌
+              </button>
+            )}
+          </div>
 
-          <button onClick={onStartTracking}>Śledź lokalizacje</button>
-          <button onClick={onStopTracking}>Stop</button>
-          {isAdmin && (
-            <button
-              onClick={() => {
-                state.tracks.forEach((t) =>
-                  dispatch({ type: "DELETE_TRACK", payload: t.id })
-                );
-              }}
-            >
-              ❌
-            </button>
-          )}
-
-          <hr />
-
-          <div>
+          <footer>
             Zalogowany jako <strong>{user?.username} </strong>
             <button onClick={onLogout}>Wyloguj</button>
-          </div>
+          </footer>
         </>
       )}
     </aside>

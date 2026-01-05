@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "../auth/AuthContext";
+import "./LoginPage.scss";
 
 export function LoginPage() {
   const [username, setUsername] = useState("");
@@ -12,8 +13,10 @@ export function LoginPage() {
   };
 
   return (
-    <div style={{ padding: 40 }}>
-      <h2>Logowanie</h2>
+    <div>
+      <header>
+        <h2>Logowanie</h2>
+      </header>
 
       <form onSubmit={handleSubmit}>
         <input
@@ -24,7 +27,7 @@ export function LoginPage() {
         <button type="submit">Zaloguj</button>
       </form>
 
-      <p style={{ marginTop: 10 }}>
+      <p>
         Wpisz <strong>admin</strong>, aby zalogować się jako administrator
       </p>
     </div>
