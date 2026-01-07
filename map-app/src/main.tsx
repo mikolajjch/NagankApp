@@ -7,13 +7,16 @@ import { AppProvider } from "./context/AppContext";
 import "leaflet/dist/leaflet.css";
 
 import { AuthProvider } from "./auth/AuthContext";
+import { BrowserRouter } from "react-router-dom";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <AuthProvider>
-      <AppProvider>
-        <App />
-      </AppProvider>
-    </AuthProvider>
+    <BrowserRouter>
+      <AuthProvider>
+        <AppProvider>
+          <App />
+        </AppProvider>
+      </AuthProvider>
+    </BrowserRouter>
   </StrictMode>
 );

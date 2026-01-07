@@ -1,8 +1,11 @@
 import { useState } from "react";
 import { useAuth } from "../auth/AuthContext";
 import "./LoginPage.scss";
+import { useNavigate } from "react-router-dom";
 
 export function LoginPage() {
+  const navigate = useNavigate();
+
   const [username, setUsername] = useState("");
   const { login } = useAuth();
 
@@ -10,6 +13,7 @@ export function LoginPage() {
     e.preventDefault();
     if (!username.trim()) return;
     login(username.trim());
+    navigate("app");
   };
 
   return (

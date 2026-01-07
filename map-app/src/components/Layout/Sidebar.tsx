@@ -6,6 +6,7 @@ import { ActionAreaList } from "../ActionArea/ActionAreaList";
 import { DrawnActionSave } from "../ActionArea/DrawnActionSave";
 
 import { useAuth } from "../../auth/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 type Props = {
   open: boolean;
@@ -26,6 +27,11 @@ export function Sidebar({
   const [drawMode, setDrawMode] = useState(false);
   const { user } = useAuth();
   const isAdmin = user?.role === "admin";
+  const navigate = useNavigate();
+  const handleLogout = () => {
+    onLogout();
+    navigate("/login");
+  };
 
   return (
     <aside className={`sidebar ${open ? "sidebar--open" : ""}`}>
@@ -63,9 +69,15 @@ export function Sidebar({
             <button
               disabled={!state.activeActionId}
               onClick={() =>
-                dispatch({ type: "SET_EDIT_ACTION_MODE", payload: true })
+                dispatch({
+                  type: "SET_EDIT_ACTION_MODE",
+                  payload: !state.editActionMode,
+                })
               }
-              title="Edytuj nagankę"
+              title="Edytuj aktywną nagankę"
+              style={{
+                background: state.editActionMode ? "#7f967fff" : undefined,
+              }}
             >
               ✋
             </button>
@@ -127,7 +139,7 @@ export function Sidebar({
             {isAdmin && (
               <button
                 onClick={() => {
-                  state.tracks.forEach((t) =>
+                  state.tracks.forEach((t: any) =>
                     dispatch({ type: "DELETE_TRACK", payload: t.id })
                   );
                 }}
@@ -139,7 +151,7 @@ export function Sidebar({
 
           <footer>
             Zalogowany jako <strong>{user?.username} </strong>
-            <button onClick={onLogout}>Wyloguj</button>
+            <button onClick={handleLogout}>Wyloguj</button>
           </footer>
         </>
       )}

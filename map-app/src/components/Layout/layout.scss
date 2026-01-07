@@ -152,6 +152,7 @@ button {
 }
 button:hover {
   border-color: #0b4603;
+  background-color: #e1eee1ff;
 }
 button:focus,
 button:focus-visible {
@@ -177,4 +178,15 @@ button:focus-visible {
   padding-top: 12px;
   border-top: 1px solid rgba(255, 255, 255, 0.3);
   font-size: 0.9rem;
+  justify-content: space-evenly;
+}
+
+.location__panel {
+  button {
+    border-radius: 0;
+  }
+}
+
+.sidebar__modes {
+  justify-content: space-evenly;
 }

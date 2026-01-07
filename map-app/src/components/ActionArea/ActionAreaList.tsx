@@ -17,7 +17,12 @@ export function ActionAreaList() {
       {state.actions.map((action) => (
         <div
           key={action.id}
-          style={{ marginBottom: 4, display: "flex", alignItems: "center" }}
+          style={{
+            marginBottom: 4,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
         >
           <strong>{action.name}</strong>
 
