@@ -32,6 +32,7 @@ export function Sidebar({
     onLogout();
     navigate("/login");
   };
+  const [confirmClearTracks, setConfirmClearTracks] = useState(false);
 
   return (
     <aside className={`sidebar ${open ? "sidebar--open" : ""}`}>
@@ -139,9 +140,7 @@ export function Sidebar({
             {isAdmin && (
               <button
                 onClick={() => {
-                  state.tracks.forEach((t: any) =>
-                    dispatch({ type: "DELETE_TRACK", payload: t.id })
-                  );
+                  setConfirmClearTracks(true);
                 }}
               >
                 ❌
@@ -158,6 +157,35 @@ export function Sidebar({
               Wyloguj
             </button>
           </footer>
+
+          {confirmClearTracks && (
+            <div className="modal__overlay">
+              <div className="modal">
+                <h2>Usunąć lokalizację?</h2>
+                <p>
+                  Ta operacja usunie z mapy
+                  <strong> wszystkie zapisane punkty lokalizacji</strong>{" "}
+                </p>
+
+                <div className="modal__actions">
+                  <button
+                    onClick={() => {
+                      state.tracks.forEach((t: any) =>
+                        dispatch({ type: "DELETE_TRACK", payload: t.id })
+                      );
+                      setConfirmClearTracks(false);
+                    }}
+                  >
+                    Usuń
+                  </button>
+
+                  <button onClick={() => setConfirmClearTracks(false)}>
+                    Anuluj
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </>
       )}
     </aside>

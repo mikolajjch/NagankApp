@@ -1,10 +1,13 @@
 import { useAppContext } from "../../context/AppContext";
 import { useAuth } from "../../auth/AuthContext";
+import { useState } from "react";
 
 export function ActionAreaList() {
   const { state, dispatch } = useAppContext();
   const { user } = useAuth();
   const isAdmin = user?.role === "admin";
+  const [confirmId, setConfirmId] = useState<string | null>(null);
+  const actionToDelete = state.actions.find((a: any) => a.id === confirmId);
 
   if (state.actions.length === 0) {
     return <p>Brak dodanych naganek</p>;
@@ -14,7 +17,7 @@ export function ActionAreaList() {
     <div style={{ marginBottom: 12 }}>
       <h4>Naganki</h4>
 
-      {state.actions.map((action) => (
+      {state.actions.map((action: any) => (
         <div
           key={action.id}
           style={{
@@ -28,9 +31,7 @@ export function ActionAreaList() {
 
           {isAdmin && (
             <button
-              onClick={() =>
-                dispatch({ type: "DELETE_ACTION", payload: action.id })
-              }
+              onClick={() => setConfirmId(action.id)}
               style={{
                 marginLeft: 8,
                 color: "red",
@@ -61,6 +62,30 @@ export function ActionAreaList() {
           )}
         </div>
       ))}
+      {confirmId && (
+        <div className="modal__overlay">
+          <div className="modal">
+            <h2>Usunąć "{actionToDelete?.name}"?</h2>
+            <p>
+              Usunięcie naganki spowoduje również usunięcie przypisanych
+              ścieżek.
+            </p>
+
+            <div className="modal__actions">
+              <button
+                onClick={() => {
+                  dispatch({ type: "DELETE_ACTION", payload: confirmId });
+                  setConfirmId(null);
+                }}
+              >
+                Usuń
+              </button>
+
+              <button onClick={() => setConfirmId(null)}>Anuluj</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
