@@ -190,3 +190,9 @@ button:focus-visible {
 .sidebar__modes {
   justify-content: space-evenly;
 }
+
+footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}

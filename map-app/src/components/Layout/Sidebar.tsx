@@ -150,8 +150,13 @@ export function Sidebar({
           </div>
 
           <footer>
-            Zalogowany jako <strong>{user?.username} </strong>
-            <button onClick={handleLogout}>Wyloguj</button>
+            <div>
+              Zalogowany jako <strong>{user?.username} </strong>
+            </div>
+
+            <button onClick={handleLogout} style={{ background: "#c45656ff" }}>
+              Wyloguj
+            </button>
           </footer>
         </>
       )}

@@ -228,6 +228,18 @@ export function MapView() {
     };
   }, [state.drawMode, state.routeDrawMode]);
 
+  useEffect(() => {
+    if (!mapRef.current) return;
+
+    const container = mapRef.current.getContainer();
+
+    if (state.drawMode || state.routeDrawMode || state.editActionMode) {
+      container.style.cursor = "crosshair";
+    } else {
+      container.style.cursor = "";
+    }
+  }, [state.drawMode, state.routeDrawMode, state.editActionMode]);
+
   return (
     <div
       id="map"

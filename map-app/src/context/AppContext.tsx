@@ -98,6 +98,7 @@ function reducer(state: AppState, action: Action): AppState {
       return {
         ...state,
         actions: state.actions.filter((a) => a.id != del_id),
+        routes: state.routes.filter((r) => r.actionId != del_id),
         activeActionId:
           state.activeActionId == del_id ? null : state.activeActionId,
       };
