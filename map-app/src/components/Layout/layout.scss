@@ -1,6 +1,7 @@
 .layout {
   display: flex;
   height: 100vh;
+  overflow: hidden;
 }
 
 .layout__main {
@@ -10,7 +11,12 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+
+  overflow-y: auto;
+  overflow-x: hidden;
+  min-height: 0;
 }
+
 .layout__main > header {
   width: 100%;
   max-width: 77vh;
@@ -31,6 +37,19 @@
   border: 2px solid #ccc;
   border-radius: 8px;
   overflow: hidden;
+
+  flex: 0 0 auto;
+}
+
+.map-info {
+  width: 100%;
+  max-width: 77vh;
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.92);
+  color: #111;
+  box-shadow: 0 2px 6px rgba(7, 7, 6, 0.18);
 }
 
 .sidebar__toggle {
