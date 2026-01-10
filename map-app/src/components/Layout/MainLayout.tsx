@@ -4,6 +4,7 @@ import { useTracker } from "../../hooks/useTracker";
 import { MapView } from "../Map/MapView";
 import { Sidebar } from "./Sidebar";
 import { RouteInfo } from "../Map/RouteInfo";
+import { useAppContext } from "../../context/AppContext";
 
 import "./layout.scss";
 
@@ -12,6 +13,8 @@ export function MainLayout() {
   const { startTracking, stopTracking } = useTracker();
 
   const [sidebarOpen, setSidebarOpen] = useState(true);
+
+  const { state } = useAppContext();
 
   return (
     <div className="layout">
@@ -32,6 +35,17 @@ export function MainLayout() {
         <div className="map-info">
           <strong>Panel informacyjny</strong>
           <RouteInfo />
+          {state.lastMapClick && (
+            <div style={{ marginTop: 6 }}>
+              <div>Ostatnia interakcja z mapą:</div>
+              <div>
+                lat: <strong>{state.lastMapClick.lat.toFixed(6)}</strong>
+              </div>
+              <div>
+                lng: <strong>{state.lastMapClick.lng.toFixed(6)}</strong>
+              </div>
+            </div>
+          )}
         </div>
       </main>
     </div>

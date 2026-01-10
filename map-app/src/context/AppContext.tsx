@@ -18,6 +18,8 @@ interface AppState {
   routes: Route[];
   routeDrawMode: boolean;
   routePoints: { lat: number; lng: number }[];
+
+  lastMapClick: { lat: number; lng: number } | null;
 }
 
 type Action =
@@ -46,7 +48,12 @@ type Action =
   | { type: "SET_ROUTE_DRAW_MODE"; payload: boolean }
   | { type: "ADD_ROUTE_POINT"; payload: { lat: number; lng: number } }
   | { type: "CLEAR_ROUTE_POINTS" }
-  | { type: "SAVE_ROUTE" };
+  | { type: "SAVE_ROUTE" }
+  //
+  | {
+      type: "SET_LAST_MAP_CLICK";
+      payload: { lat: number; lng: number };
+    };
 
 const persisted = loadAppState();
 const initialState: AppState = {
@@ -62,6 +69,8 @@ const initialState: AppState = {
   routes: persisted?.routes ?? [],
   routeDrawMode: false,
   routePoints: [],
+
+  lastMapClick: null,
 };
 
 function reducer(state: AppState, action: Action): AppState {
@@ -168,6 +177,12 @@ function reducer(state: AppState, action: Action): AppState {
         routeDrawMode: false,
       };
     /////////////////////////////////////
+    case "SET_LAST_MAP_CLICK":
+      return {
+        ...state,
+        lastMapClick: action.payload,
+      };
+    ////////////////////////////////////////////////////////////////////////////////// default
     default:
       return state;
   }

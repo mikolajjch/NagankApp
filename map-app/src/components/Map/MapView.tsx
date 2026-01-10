@@ -200,6 +200,14 @@ export function MapView() {
     const map = mapRef.current;
 
     const onClick = (e: L.LeafletMouseEvent) => {
+      dispatch({
+        type: "SET_LAST_MAP_CLICK",
+        payload: {
+          lat: e.latlng.lat,
+          lng: e.latlng.lng,
+        },
+      });
+
       if (state.drawMode) {
         dispatch({
           type: "ADD_DRAW_POINT",
