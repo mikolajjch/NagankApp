@@ -14,54 +14,55 @@ export function ActionAreaList() {
   }
 
   return (
-    <div style={{ marginBottom: 12 }}>
+    <div className="action-area" style={{ marginBottom: 12 }}>
       <h4>Naganki</h4>
+      <div className="action-list">
+        {state.actions.map((action: any) => (
+          <div
+            key={action.id}
+            style={{
+              marginBottom: 4,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
+            <strong>{action.name}</strong>
 
-      {state.actions.map((action: any) => (
-        <div
-          key={action.id}
-          style={{
-            marginBottom: 4,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <strong>{action.name}</strong>
+            {isAdmin && (
+              <button
+                onClick={() => setConfirmId(action.id)}
+                style={{
+                  marginLeft: 8,
+                  color: "red",
+                  border: "none",
+                  background: "transparent",
+                  cursor: "pointer",
+                }}
+                title="Usuń nagankę"
+              >
+                ❌
+              </button>
+            )}
 
-          {isAdmin && (
-            <button
-              onClick={() => setConfirmId(action.id)}
-              style={{
-                marginLeft: 8,
-                color: "red",
-                border: "none",
-                background: "transparent",
-                cursor: "pointer",
-              }}
-              title="Usuń nagankę"
-            >
-              ❌
-            </button>
-          )}
-
-          {state.activeActionId === action.id ? (
-            <span style={{ marginLeft: 6 }}>(aktywna)</span>
-          ) : (
-            <button
-              style={{ marginLeft: 6 }}
-              onClick={() =>
-                dispatch({
-                  type: "SET_ACTIVE_ACTION",
-                  payload: action.id,
-                })
-              }
-            >
-              Ustaw aktywną
-            </button>
-          )}
-        </div>
-      ))}
+            {state.activeActionId === action.id ? (
+              <span style={{ marginLeft: 6 }}>(aktywna)</span>
+            ) : (
+              <button
+                style={{ marginLeft: 6 }}
+                onClick={() =>
+                  dispatch({
+                    type: "SET_ACTIVE_ACTION",
+                    payload: action.id,
+                  })
+                }
+              >
+                Ustaw aktywną
+              </button>
+            )}
+          </div>
+        ))}
+      </div>
       {confirmId && (
         <div className="modal__overlay">
           <div className="modal">

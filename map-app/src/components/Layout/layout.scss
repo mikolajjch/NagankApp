@@ -219,3 +219,30 @@ footer {
   display: flex;
   justify-content: space-evenly;
 }
+
+.action-list {
+  max-height: 10rem;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.action-list::-webkit-scrollbar {
+  width: 6px;
+}
+.action-list::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.35);
+  border-radius: 4px;
+}
+.action-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 6px;
+  border-radius: 6px;
+}
+.action-row:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+.action-row--active {
+  background: rgba(255, 255, 255, 0.25);
+}

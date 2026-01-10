@@ -42,6 +42,21 @@ export function Sidebar({
 
       {open && (
         <>
+          <div className="location__panel">
+            <h4>Lokalizacja</h4>
+            <button onClick={onStartTracking}>Śledź lokalizacje</button>
+            <button onClick={onStopTracking}>Stop</button>
+            {isAdmin && (
+              <button
+                onClick={() => {
+                  setConfirmClearTracks(true);
+                }}
+              >
+                ❌
+              </button>
+            )}
+          </div>
+
           <h4>Dostępne narzędzia</h4>
 
           <div className="sidebar__modes">
@@ -51,7 +66,7 @@ export function Sidebar({
                 dispatch({ type: "SET_DRAW_MODE", payload: false });
                 dispatch({ type: "SET_ROUTE_DRAW_MODE", payload: false });
               }}
-              title="Tryb przeglądania"
+              title="Dodawanie po koordynatach"
             >
               🧭
             </button>
@@ -132,21 +147,6 @@ export function Sidebar({
           )}
 
           <ActionAreaList />
-
-          <div className="location__panel">
-            <h4>Lokalizacja</h4>
-            <button onClick={onStartTracking}>Śledź lokalizacje</button>
-            <button onClick={onStopTracking}>Stop</button>
-            {isAdmin && (
-              <button
-                onClick={() => {
-                  setConfirmClearTracks(true);
-                }}
-              >
-                ❌
-              </button>
-            )}
-          </div>
 
           <footer>
             <div>
