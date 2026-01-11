@@ -4,6 +4,7 @@ import type { Track, TrackPoint } from "../types/Track";
 import type { User } from "../types/User";
 import { loadAppState, saveAppState } from "../services/appStorage.ts";
 import type { Route } from "../types/Route.ts";
+import type { Group } from "../types/Group.ts";
 
 interface AppState {
   user: User | null;
@@ -20,6 +21,8 @@ interface AppState {
   routePoints: { lat: number; lng: number }[];
 
   lastMapClick: { lat: number; lng: number } | null;
+
+  groups: Group[];
 }
 
 type Action =
@@ -53,6 +56,12 @@ type Action =
   | {
       type: "SET_LAST_MAP_CLICK";
       payload: { lat: number; lng: number };
+    }
+  ////////////
+  | { type: "ADD_GROUP"; payload: Group }
+  | {
+      type: "ADD_GROUP_MEMBER";
+      payload: { groupId: string; username: string };
     };
 
 const persisted = loadAppState();
@@ -71,6 +80,8 @@ const initialState: AppState = {
   routePoints: [],
 
   lastMapClick: null,
+
+  groups: persisted?.groups ?? [],
 };
 
 function reducer(state: AppState, action: Action): AppState {
@@ -182,6 +193,24 @@ function reducer(state: AppState, action: Action): AppState {
         ...state,
         lastMapClick: action.payload,
       };
+    /////////////////////////////////////
+    case "ADD_GROUP":
+      return {
+        ...state,
+        groups: [...state.groups, action.payload],
+      };
+
+    case "ADD_GROUP_MEMBER":
+      return {
+        ...state,
+        groups: state.groups.map((g) =>
+          g.id === action.payload.groupId &&
+          !g.members.includes(action.payload.username)
+            ? { ...g, members: [...g.members, action.payload.username] }
+            : g
+        ),
+      };
+
     ////////////////////////////////////////////////////////////////////////////////// default
     default:
       return state;
@@ -201,8 +230,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({
       tracks: state.tracks,
       activeActionId: state.activeActionId,
       routes: state.routes,
+      groups: state.groups,
     });
-  }, [state.actions, state.tracks, state.activeActionId, state.routes]);
+  }, [
+    state.actions,
+    state.tracks,
+    state.activeActionId,
+    state.routes,
+    state.groups,
+  ]);
 
   return (
     <AppContext.Provider value={{ state, dispatch }}>
