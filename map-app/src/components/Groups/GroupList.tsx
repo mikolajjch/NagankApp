@@ -4,7 +4,7 @@ import { AddMember } from "./AddMember";
 import type { Group } from "../../types/Group";
 
 export function GroupList() {
-  const { state } = useAppContext();
+  const { state, dispatch } = useAppContext();
   const { user } = useAuth();
 
   if (!user) return null;
@@ -38,6 +38,18 @@ export function GroupList() {
           </div>
 
           <AddMember groupId={g.id} />
+          {(g.ownerId == user.username || user.role == "admin") && (
+            <button
+              onClick={() => {
+                dispatch({
+                  type: "DELETE_GROUP",
+                  payload: g.id,
+                });
+              }}
+            >
+              Usuń grupę
+            </button>
+          )}
         </div>
       ))}
     </div>

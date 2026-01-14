@@ -59,6 +59,7 @@ type Action =
     }
   ////////////
   | { type: "ADD_GROUP"; payload: Group }
+  | { type: "DELETE_GROUP"; payload: string }
   | {
       type: "ADD_GROUP_MEMBER";
       payload: { groupId: string; username: string };
@@ -198,6 +199,11 @@ function reducer(state: AppState, action: Action): AppState {
       return {
         ...state,
         groups: [...state.groups, action.payload],
+      };
+    case "DELETE_GROUP":
+      return {
+        ...state,
+        groups: state.groups.filter((g) => g.id !== action.payload),
       };
 
     case "ADD_GROUP_MEMBER":
