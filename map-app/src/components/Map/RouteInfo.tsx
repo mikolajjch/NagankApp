@@ -1,6 +1,7 @@
 import { useAppContext } from "../../context/AppContext";
 import { findNearestPoint } from "../../services/nearestPath";
 import type { Route } from "../../types/Route";
+import { useMemo } from "react";
 
 export function RouteInfo() {
   const { state } = useAppContext();
@@ -23,12 +24,9 @@ export function RouteInfo() {
 
   const userPos = lastTrack.points[lastTrack.points.length - 1];
 
-  const nearest = findNearestPoint(
-    userPos.lat,
-    userPos.lng,
-    activeRoute.points
-    ///allRoutePoints
-  );
+  const nearest = useMemo(() => {
+    return findNearestPoint(userPos.lat, userPos.lng, activeRoute.points);
+  }, [userPos.lat, userPos.lng, activeRoute.points]);
 
   if (!nearest) {
     return <div>Nie znaleziono punktu ścieżki</div>;
