@@ -1,6 +1,7 @@
 import { useAppContext } from "../../context/AppContext";
 import { useAuth } from "../../auth/AuthContext";
 import { AddMember } from "./AddMember";
+import { GroupComments } from "./GroupComments";
 import type { Group } from "../../types/Group";
 
 export function GroupList() {
@@ -34,10 +35,19 @@ export function GroupList() {
           <strong>{g.name}</strong>
 
           <div style={{ fontSize: "0.8rem", marginBottom: 6 }}>
-            Członkowie: {g.members.join(", ")}
+            Członkowie:{" "}
+            {g.members
+              .map((m: string) => {
+                const rep = state.reputations[m] ?? 0;
+                return `${m} (★${rep})`;
+              })
+              .join(", ")}
           </div>
 
           <AddMember groupId={g.id} />
+
+          <GroupComments groupId={g.id} />
+
           {(g.ownerId == user.username || user.role == "admin") && (
             <button
               onClick={() => {
@@ -46,6 +56,7 @@ export function GroupList() {
                   payload: g.id,
                 });
               }}
+              style={{ marginTop: 8 }}
             >
               Usuń grupę
             </button>

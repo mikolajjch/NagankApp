@@ -4,7 +4,7 @@ import type { Track, TrackPoint } from "../types/Track";
 import type { User } from "../types/User";
 import { loadAppState, saveAppState } from "../services/appStorage.ts";
 import type { Route } from "../types/Route.ts";
-import type { Group } from "../types/Group.ts";
+import type { Group, GroupComment } from "../types/Group.ts";
 
 interface AppState {
   user: User | null;
@@ -23,6 +23,8 @@ interface AppState {
   lastMapClick: { lat: number; lng: number } | null;
 
   groups: Group[];
+  comments: GroupComment[];
+  reputations: Record<string, number>;
 }
 
 type Action =
@@ -63,6 +65,13 @@ type Action =
   | {
       type: "ADD_GROUP_MEMBER";
       payload: { groupId: string; username: string };
+    }
+  ////////////
+  | { type: "ADD_GROUP_COMMENT"; payload: GroupComment }
+  | { type: "DELETE_GROUP_COMMENT"; payload: string }
+  | {
+      type: "INCREMENT_REPUTATION";
+      payload: { username: string; delta: number };
     };
 
 const persisted = loadAppState();
@@ -83,6 +92,8 @@ const initialState: AppState = {
   lastMapClick: null,
 
   groups: persisted?.groups ?? [],
+  comments: persisted?.comments ?? [],
+  reputations: persisted?.reputations ?? {},
 };
 
 function reducer(state: AppState, action: Action): AppState {
@@ -114,7 +125,7 @@ function reducer(state: AppState, action: Action): AppState {
     case "SET_EDIT_ACTION_MODE":
       return { ...state, editActionMode: action.payload };
 
-    case "DELETE_ACTION":
+    case "DELETE_ACTION": {
       const del_id = action.payload;
       return {
         ...state,
@@ -123,6 +134,7 @@ function reducer(state: AppState, action: Action): AppState {
         activeActionId:
           state.activeActionId == del_id ? null : state.activeActionId,
       };
+    }
     case "SET_DRAW_MODE":
       return {
         ...state,
@@ -163,7 +175,7 @@ function reducer(state: AppState, action: Action): AppState {
         tracks: state.tracks.filter((t) => t.id !== action.payload),
       };
 
-    ///////////////////////////////// logika ścieżki do przejścia
+    ///////////////////////////////// logika sciezki do przejscia
     case "SET_ROUTE_DRAW_MODE":
       return { ...state, routeDrawMode: action.payload };
     case "ADD_ROUTE_POINT":
@@ -217,7 +229,28 @@ function reducer(state: AppState, action: Action): AppState {
         ),
       };
 
-    ////////////////////////////////////////////////////////////////////////////////// default
+    ///////////////////////////////// komentarze i reputacja
+    case "ADD_GROUP_COMMENT":
+      return {
+        ...state,
+        comments: [...state.comments, action.payload],
+      };
+
+    case "DELETE_GROUP_COMMENT":
+      return {
+        ...state,
+        comments: state.comments.filter((c) => c.id !== action.payload),
+      };
+
+    case "INCREMENT_REPUTATION": {
+      const { username, delta } = action.payload;
+      const current = state.reputations[username] ?? 0;
+      return {
+        ...state,
+        reputations: { ...state.reputations, [username]: current + delta },
+      };
+    }
+
     default:
       return state;
   }
@@ -237,6 +270,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({
       activeActionId: state.activeActionId,
       routes: state.routes,
       groups: state.groups,
+      comments: state.comments,
+      reputations: state.reputations,
     });
   }, [
     state.actions,
@@ -244,6 +279,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({
     state.activeActionId,
     state.routes,
     state.groups,
+    state.comments,
+    state.reputations,
   ]);
 
   return (
