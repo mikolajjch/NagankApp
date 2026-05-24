@@ -9,4 +9,6 @@ export interface ActionArea {
   }[];
 
   createdAt: string;
+
+  groupId: string | null;
 }

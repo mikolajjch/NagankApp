@@ -9,15 +9,19 @@ export function ActionAreaList() {
   const [confirmId, setConfirmId] = useState<string | null>(null);
   const actionToDelete = state.actions.find((a: any) => a.id === confirmId);
 
-  if (state.actions.length === 0) {
-    return <p>Brak dodanych naganek</p>;
+  const visibleActions = state.actions.filter(
+    (a: any) => (a.groupId ?? null) === state.activeGroupId
+  );
+
+  if (visibleActions.length === 0) {
+    return <p>Brak naganek w tej grupie</p>;
   }
 
   return (
     <div className="action-area" style={{ marginBottom: 12 }}>
       <h4>Naganki</h4>
       <div className="action-list">
-        {state.actions.map((action: any) => (
+        {visibleActions.map((action: any) => (
           <div
             key={action.id}
             style={{

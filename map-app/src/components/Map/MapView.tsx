@@ -3,6 +3,8 @@ import L from "leaflet";
 import { useAppContext } from "../../context/AppContext";
 import { findNearestPoint } from "../../services/nearestPath";
 import type { Route } from "../../types/Route";
+import type { Track } from "../../types/Track";
+import type { ActionArea } from "../../types/ActionArea";
 
 export function MapView() {
   const mapRef = useRef<L.Map | null>(null);
@@ -32,7 +34,21 @@ export function MapView() {
 
     layersRef.current.clearLayers();
 
-    state.actions.forEach((action) => {
+    // pokazujemy tylko obiekty z aktywnej grupy
+    const visibleActions = state.actions.filter(
+      (a: ActionArea) => (a.groupId ?? null) === state.activeGroupId
+    );
+    const visibleIds = new Set<string>(
+      visibleActions.map((a: ActionArea) => a.id)
+    );
+    const visibleTracks = state.tracks.filter((t: Track) =>
+      visibleIds.has(t.actionId)
+    );
+    const visibleRoutes = state.routes.filter((r: Route) =>
+      visibleIds.has(r.actionId)
+    );
+
+    visibleActions.forEach((action: ActionArea) => {
       const polygon = action.area.map((p) => [p.lat, p.lng]) as [
         number,
         number
@@ -41,38 +57,40 @@ export function MapView() {
     });
 
     if (state.editActionMode && state.activeActionId) {
-      const activeAction = state.actions.find(
-        (a) => a.id === state.activeActionId
+      const activeAction = visibleActions.find(
+        (a: ActionArea) => a.id === state.activeActionId
       );
 
       if (activeAction) {
-        activeAction.area.forEach((point, index) => {
-          const marker = L.marker([point.lat, point.lng], {
-            draggable: true,
-          }).addTo(layersRef.current!);
+        activeAction.area.forEach(
+          (point: { lat: number; lng: number }, index: number) => {
+            const marker = L.marker([point.lat, point.lng], {
+              draggable: true,
+            }).addTo(layersRef.current!);
 
-          marker.on("dragend", (e) => {
-            const latlng = e.target.getLatLng();
+            marker.on("dragend", (e) => {
+              const latlng = e.target.getLatLng();
 
-            const newArea = [...activeAction.area];
-            newArea[index] = {
-              lat: latlng.lat,
-              lng: latlng.lng,
-            };
+              const newArea = [...activeAction.area];
+              newArea[index] = {
+                lat: latlng.lat,
+                lng: latlng.lng,
+              };
 
-            dispatch({
-              type: "UPDATE_ACTION",
-              payload: {
-                actionId: activeAction.id,
-                area: newArea,
-              },
+              dispatch({
+                type: "UPDATE_ACTION",
+                payload: {
+                  actionId: activeAction.id,
+                  area: newArea,
+                },
+              });
             });
-          });
-        });
+          }
+        );
       }
     }
 
-    state.tracks.forEach((track) => {
+    visibleTracks.forEach((track: Track) => {
       const lastPoint = track.points[track.points.length - 1];
       L.circleMarker([lastPoint.lat, lastPoint.lng], {
         radius: 10,
@@ -90,10 +108,9 @@ export function MapView() {
 
     // tymczasowe rysowanie
     if (state.drawingPoints.length >= 2) {
-      const temp = state.drawingPoints.map((p) => [p.lat, p.lng]) as [
-        number,
-        number
-      ][];
+      const temp = state.drawingPoints.map(
+        (p: { lat: number; lng: number }) => [p.lat, p.lng]
+      ) as [number, number][];
 
       if (state.drawingPoints.length === 2) {
         L.polyline(temp, {
@@ -109,7 +126,7 @@ export function MapView() {
     }
 
     /////////////////// obsługa ścieżki
-    state.routes.forEach((route) => {
+    visibleRoutes.forEach((route: Route) => {
       if (route.points.length < 2) return;
 
       const line = route.points.map((p) => [p.lat, p.lng]) as [
@@ -124,10 +141,9 @@ export function MapView() {
     });
 
     if (state.routePoints.length >= 2) {
-      const temp = state.routePoints.map((p) => [p.lat, p.lng]) as [
-        number,
-        number
-      ][];
+      const temp = state.routePoints.map(
+        (p: { lat: number; lng: number }) => [p.lat, p.lng]
+      ) as [number, number][];
 
       L.polyline(temp, {
         color: "blue",
@@ -135,9 +151,9 @@ export function MapView() {
       }).addTo(layersRef.current!);
     }
     ///////////////////
-    //// wektor do najbliższego punkty ścieżki
-    const lastTrack = state.tracks[state.tracks.length - 1];
-    const activeRoute = state.routes.find(
+    //// wektor do najbliższego punktu ścieżki
+    const lastTrack = visibleTracks[visibleTracks.length - 1];
+    const activeRoute = visibleRoutes.find(
       (r: Route) => r.actionId === state.activeActionId
     );
 
@@ -174,6 +190,7 @@ export function MapView() {
     state.drawingPoints,
     state.routes,
     state.routePoints,
+    state.activeGroupId,
   ]);
 
   //centrowanie przy zmianie aktywnej
@@ -181,11 +198,15 @@ export function MapView() {
     if (!mapRef.current) return;
     if (!state.activeActionId) return;
 
-    const active = state.actions.find((a) => a.id === state.activeActionId);
+    const active = state.actions.find(
+      (a: ActionArea) => a.id === state.activeActionId
+    );
     if (!active) return;
     if (active.area.length < 3) return;
 
-    const latLngs = active.area.map((p) => L.latLng(p.lat, p.lng));
+    const latLngs = active.area.map((p: { lat: number; lng: number }) =>
+      L.latLng(p.lat, p.lng)
+    );
     const bounds = L.latLngBounds(latLngs);
 
     mapRef.current.fitBounds(bounds, {

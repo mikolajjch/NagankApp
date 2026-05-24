@@ -5,8 +5,6 @@ import { MapView } from "../Map/MapView";
 import { Sidebar } from "./Sidebar";
 import { RouteInfo } from "../Map/RouteInfo";
 import { useAppContext } from "../../context/AppContext";
-import { CreateGroup } from "../Groups/CreateGroup";
-import { GroupList } from "../Groups/GroupList";
 
 import "./layout.scss";
 
@@ -48,11 +46,6 @@ export function MainLayout() {
               </div>
             </div>
           )}
-        </div>
-
-        <div className="groups-container">
-          <CreateGroup />
-          <GroupList />
         </div>
       </main>
     </div>

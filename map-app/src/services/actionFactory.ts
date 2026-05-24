@@ -9,5 +9,6 @@ export function createActionArea(
     name,
     area,
     createdAt: new Date().toISOString(),
+    groupId: null,
   };
 }

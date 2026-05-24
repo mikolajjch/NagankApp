@@ -4,6 +4,7 @@ import { useAppContext } from "../../context/AppContext";
 import { ActionAreaForm } from "../ActionArea/ActionAreaForm";
 import { ActionAreaList } from "../ActionArea/ActionAreaList";
 import { DrawnActionSave } from "../ActionArea/DrawnActionSave";
+import { GroupBar } from "../Groups/GroupBar";
 
 import { useAuth } from "../../auth/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -42,20 +43,7 @@ export function Sidebar({
 
       {open && (
         <>
-          <div className="location__panel">
-            <h4>Lokalizacja</h4>
-            <button onClick={onStartTracking}>Śledź lokalizacje</button>
-            <button onClick={onStopTracking}>Stop</button>
-            {isAdmin && (
-              <button
-                onClick={() => {
-                  setConfirmClearTracks(true);
-                }}
-              >
-                ❌
-              </button>
-            )}
-          </div>
+          <GroupBar />
 
           <h4>Dostępne narzędzia</h4>
 
@@ -147,6 +135,21 @@ export function Sidebar({
           )}
 
           <ActionAreaList />
+
+          <div className="location__panel">
+            <h4>Lokalizacja</h4>
+            <button onClick={onStartTracking}>Śledź lokalizacje</button>
+            <button onClick={onStopTracking}>Stop</button>
+            {isAdmin && (
+              <button
+                onClick={() => {
+                  setConfirmClearTracks(true);
+                }}
+              >
+                ❌
+              </button>
+            )}
+          </div>
 
           <footer>
             <div>

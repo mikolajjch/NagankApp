@@ -9,6 +9,7 @@ export type PersistedAppState = {
   actions: ActionArea[];
   tracks: Track[];
   activeActionId: string | null;
+  activeGroupId: string | null;
   routes: Route[];
   groups: Group[];
   comments: GroupComment[];

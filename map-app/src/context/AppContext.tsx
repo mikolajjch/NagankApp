@@ -23,6 +23,7 @@ interface AppState {
   lastMapClick: { lat: number; lng: number } | null;
 
   groups: Group[];
+  activeGroupId: string | null;
   comments: GroupComment[];
   reputations: Record<string, number>;
 }
@@ -62,6 +63,7 @@ type Action =
   ////////////
   | { type: "ADD_GROUP"; payload: Group }
   | { type: "DELETE_GROUP"; payload: string }
+  | { type: "SET_ACTIVE_GROUP"; payload: string | null }
   | {
       type: "ADD_GROUP_MEMBER";
       payload: { groupId: string; username: string };
@@ -92,6 +94,7 @@ const initialState: AppState = {
   lastMapClick: null,
 
   groups: persisted?.groups ?? [],
+  activeGroupId: persisted?.activeGroupId ?? null,
   comments: persisted?.comments ?? [],
   reputations: persisted?.reputations ?? {},
 };
@@ -109,7 +112,13 @@ function reducer(state: AppState, action: Action): AppState {
         drawingPoints: [],
       };
     case "ADD_ACTION":
-      return { ...state, actions: [...state.actions, action.payload] };
+      return {
+        ...state,
+        actions: [
+          ...state.actions,
+          { ...action.payload, groupId: state.activeGroupId },
+        ],
+      };
 
     case "SET_ACTIVE_ACTION":
       return { ...state, activeActionId: action.payload };
@@ -212,10 +221,25 @@ function reducer(state: AppState, action: Action): AppState {
         ...state,
         groups: [...state.groups, action.payload],
       };
-    case "DELETE_GROUP":
+    case "DELETE_GROUP": {
+      const gid = action.payload;
       return {
         ...state,
-        groups: state.groups.filter((g) => g.id !== action.payload),
+        groups: state.groups.filter((g) => g.id !== gid),
+        actions: state.actions.map((a) =>
+          a.groupId === gid ? { ...a, groupId: null } : a
+        ),
+        activeGroupId:
+          state.activeGroupId === gid ? null : state.activeGroupId,
+      };
+    }
+
+    case "SET_ACTIVE_GROUP":
+      return {
+        ...state,
+        activeGroupId: action.payload,
+        activeActionId: null,
+        editActionMode: false,
       };
 
     case "ADD_GROUP_MEMBER":
@@ -268,6 +292,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({
       actions: state.actions,
       tracks: state.tracks,
       activeActionId: state.activeActionId,
+      activeGroupId: state.activeGroupId,
       routes: state.routes,
       groups: state.groups,
       comments: state.comments,
@@ -277,6 +302,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({
     state.actions,
     state.tracks,
     state.activeActionId,
+    state.activeGroupId,
     state.routes,
     state.groups,
     state.comments,
