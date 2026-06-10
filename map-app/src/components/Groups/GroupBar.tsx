@@ -1,6 +1,6 @@
 import { useState, type CSSProperties } from "react";
 import { useAppContext } from "../../context/AppContext";
-import { useAuth } from "../../auth/AuthContext";
+import { useCurrentUser } from "../../auth/useCurrentUser";
 import { AddMember } from "./AddMember";
 import { GroupComments } from "./GroupComments";
 import type { Group } from "../../types/Group";
@@ -24,7 +24,7 @@ const tabActive: CSSProperties = {
 
 export function GroupBar() {
   const { state, dispatch } = useAppContext();
-  const { user } = useAuth();
+  const user = useCurrentUser();
   const [manageOpen, setManageOpen] = useState(false);
   const [creating, setCreating] = useState(false);
   const [newName, setNewName] = useState("");

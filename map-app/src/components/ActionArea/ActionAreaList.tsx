@@ -1,10 +1,10 @@
 import { useAppContext } from "../../context/AppContext";
-import { useAuth } from "../../auth/AuthContext";
+import { useCurrentUser } from "../../auth/useCurrentUser";
 import { useState } from "react";
 
 export function ActionAreaList() {
   const { state, dispatch } = useAppContext();
-  const { user } = useAuth();
+  const user = useCurrentUser();
   const isAdmin = user?.role === "admin";
   const [confirmId, setConfirmId] = useState<string | null>(null);
   const actionToDelete = state.actions.find((a: any) => a.id === confirmId);

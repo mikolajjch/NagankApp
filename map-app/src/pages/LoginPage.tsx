@@ -1,39 +1,22 @@
-import { useState } from "react";
 import { useAuth } from "../auth/AuthContext";
 import "./LoginPage.scss";
-import { useNavigate } from "react-router-dom";
 
 export function LoginPage() {
-  const navigate = useNavigate();
-
-  const [username, setUsername] = useState("");
-  const { login } = useAuth();
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!username.trim()) return;
-    login(username.trim());
-    navigate("app");
-  };
+  const { loginWithRedirect } = useAuth();
 
   return (
-    <div>
+    <div className="login-page">
       <header>
-        <h2>Logowanie</h2>
+        <h2>NagankApp</h2>
+        <p>Zaloguj się przez Auth0, aby kontynuować</p>
       </header>
 
-      <form onSubmit={handleSubmit}>
-        <input
-          placeholder="Nazwa użytkownika"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-        />
-        <button type="submit">Zaloguj</button>
-      </form>
-
-      <p>
-        Wpisz <strong>admin</strong>, aby zalogować się jako administrator
-      </p>
+      <button
+        className="login-btn"
+        onClick={() => loginWithRedirect()}
+      >
+        Zaloguj się
+      </button>
     </div>
   );
 }

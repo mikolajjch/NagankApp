@@ -10,6 +10,8 @@ import "./layout.scss";
 
 export function MainLayout() {
   const { logout } = useAuth();
+  const handleLogout = () =>
+    logout({ logoutParams: { returnTo: window.location.origin } });
   const { startTracking, stopTracking } = useTracker();
 
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -21,7 +23,7 @@ export function MainLayout() {
       <Sidebar
         open={sidebarOpen}
         onToggle={() => setSidebarOpen((v) => !v)}
-        onLogout={logout}
+        onLogout={handleLogout}
         onStartTracking={startTracking}
         onStopTracking={stopTracking}
       />

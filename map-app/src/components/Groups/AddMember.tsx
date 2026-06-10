@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { useAppContext } from "../../context/AppContext";
-import { useAuth } from "../../auth/AuthContext";
+import { useCurrentUser } from "../../auth/useCurrentUser";
 import type { Group } from "../../types/Group";
 
 export function AddMember({ groupId }: { groupId: string }) {
   const { state, dispatch } = useAppContext();
-  const { user } = useAuth();
+  const user = useCurrentUser();
   const [username, setUsername] = useState("");
 
   if (!user) return null;

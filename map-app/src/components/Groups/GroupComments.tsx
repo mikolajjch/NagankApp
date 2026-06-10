@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { useAppContext } from "../../context/AppContext";
-import { useAuth } from "../../auth/AuthContext";
+import { useCurrentUser } from "../../auth/useCurrentUser";
 import type { GroupComment } from "../../types/Group";
 
 export function GroupComments({ groupId }: { groupId: string }) {
   const { state, dispatch } = useAppContext();
-  const { user } = useAuth();
+  const user = useCurrentUser();
   const [text, setText] = useState("");
 
   if (!user) return null;
@@ -121,6 +121,4 @@ export function GroupComments({ groupId }: { groupId: string }) {
           Wyślij
         </button>
       </div>
-    </div>
-  );
-}
+    </di

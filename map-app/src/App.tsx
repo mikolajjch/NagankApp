@@ -4,7 +4,11 @@ import { MainLayout } from "./components/Layout/MainLayout";
 import { Routes, Route, Navigate } from "react-router-dom";
 
 export default function App() {
-  const { user } = useAuth();
+  const { isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) {
+    return <div style={{ padding: "2rem" }}>Ładowanie...</div>;
+  }
 
   return (
     <Routes>
@@ -12,10 +16,13 @@ export default function App() {
 
       <Route
         path="/app"
-        element={user ? <MainLayout /> : <Navigate to="/login" />}
+        element={isAuthenticated ? <MainLayout /> : <Navigate to="/login" />}
       />
 
-      <Route path="*" element={<Navigate to={user ? "/app" : "/login"} />} />
+      <Route
+        path="*"
+        element={<Navigate to={isAuthenticated ? "/app" : "/login"} />}
+      />
     </Routes>
   );
 }

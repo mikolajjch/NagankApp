@@ -6,7 +6,7 @@ import { ActionAreaList } from "../ActionArea/ActionAreaList";
 import { DrawnActionSave } from "../ActionArea/DrawnActionSave";
 import { GroupBar } from "../Groups/GroupBar";
 
-import { useAuth } from "../../auth/AuthContext";
+import { useCurrentUser } from "../../auth/useCurrentUser";
 import { useNavigate } from "react-router-dom";
 
 type Props = {
@@ -26,7 +26,7 @@ export function Sidebar({
 }: Props) {
   const { state, dispatch } = useAppContext();
   const [drawMode, setDrawMode] = useState(false);
-  const { user } = useAuth();
+  const user = useCurrentUser();
   const isAdmin = user?.role === "admin";
   const navigate = useNavigate();
   const handleLogout = () => {
