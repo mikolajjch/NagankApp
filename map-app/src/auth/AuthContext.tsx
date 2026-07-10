@@ -1,15 +1,15 @@
 /**
- * AuthContext – wrapper na Auth0 React SDK.
+ * AuthContext – wrapper around the Auth0 React SDK.
  *
- * Auth0 automatycznie używa PKCE (Proof Key for Code Exchange) dla
- * aplikacji typu Single Page Application – nie trzeba nic konfigurować ręcznie.
+ * Auth0 automatically uses PKCE (Proof Key for Code Exchange) for
+ * Single Page Applications – no manual configuration required.
  *
- * Jak działa PKCE w skrócie:
- *  1. SDK generuje losowy code_verifier i jego SHA-256 hash (code_challenge).
- *  2. Otwiera /authorize na Auth0 z code_challenge.
- *  3. Auth0 zwraca jednorazowy authorization code.
- *  4. SDK wymienia code + code_verifier na JWT (access_token).
- *  5. Nikt nie może ukraść code bez code_verifier – ochrona przed atakami CSRF.
+ * How PKCE works in short:
+ *  1. The SDK generates a random code_verifier and its SHA-256 hash (code_challenge).
+ *  2. It opens Auth0's /authorize with the code_challenge.
+ *  3. Auth0 returns a one-time authorization code.
+ *  4. The SDK exchanges code + code_verifier for a JWT (access_token).
+ *  5. No one can steal the code without the code_verifier – protection against CSRF attacks.
  */
 
 import React, { createContext, useContext } from "react";
@@ -23,7 +23,7 @@ export type AuthContextValue = Auth0ContextInterface;
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
-// Zmienne środowiskowe Vite (plik .env w katalogu map-app)
+// Vite environment variables (.env file in the map-app directory)
 const AUTH0_DOMAIN = import.meta.env.VITE_AUTH0_DOMAIN as string;
 const AUTH0_CLIENT_ID = import.meta.env.VITE_AUTH0_CLIENT_ID as string;
 const AUTH0_AUDIENCE = import.meta.env.VITE_AUTH0_AUDIENCE as string;

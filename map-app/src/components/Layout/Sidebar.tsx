@@ -45,7 +45,7 @@ export function Sidebar({
         <>
           <GroupBar />
 
-          <h4>Dostępne narzędzia</h4>
+          <h4>Available tools</h4>
 
           <div className="sidebar__modes">
             <button
@@ -54,7 +54,7 @@ export function Sidebar({
                 dispatch({ type: "SET_DRAW_MODE", payload: false });
                 dispatch({ type: "SET_ROUTE_DRAW_MODE", payload: false });
               }}
-              title="Dodawanie po koordynatach"
+              title="Add by coordinates"
             >
               🧭
             </button>
@@ -65,7 +65,7 @@ export function Sidebar({
                 dispatch({ type: "SET_DRAW_MODE", payload: true });
                 dispatch({ type: "SET_ROUTE_DRAW_MODE", payload: false });
               }}
-              title="Rysuj nagankę"
+              title="Draw a drive"
             >
               ✏️
             </button>
@@ -78,7 +78,7 @@ export function Sidebar({
                   payload: !state.editActionMode,
                 })
               }
-              title="Edytuj aktywną nagankę"
+              title="Edit active drive"
               style={{
                 background: state.editActionMode ? "#7f967fff" : undefined,
               }}
@@ -93,7 +93,7 @@ export function Sidebar({
                 dispatch({ type: "SET_DRAW_MODE", payload: false });
                 dispatch({ type: "SET_ROUTE_DRAW_MODE", payload: true });
               }}
-              title="Rysuj ścieżkę"
+              title="Draw a route"
             >
               🏞
             </button>
@@ -108,28 +108,28 @@ export function Sidebar({
                 onClick={() => dispatch({ type: "CLEAR_DRAW_POINTS" })}
                 style={{ width: "100%", marginBottom: 6 }}
               >
-                Wyczyść rysowanie
+                Clear drawing
               </button>
             </>
           )}
 
           {state.routeDrawMode && (
             <>
-              <h4>Rysuj ścieżkę na mapie</h4>
+              <h4>Draw a route on the map</h4>
 
               <button
                 onClick={() => dispatch({ type: "SAVE_ROUTE" })}
                 disabled={state.routePoints.length < 2}
                 style={{ width: "100%" }}
               >
-                Zapisz ścieżkę
+                Save route
               </button>
 
               <button
                 onClick={() => dispatch({ type: "CLEAR_ROUTE_POINTS" })}
                 style={{ width: "100%", marginBottom: 6 }}
               >
-                Wyczyść rysowanie
+                Clear drawing
               </button>
             </>
           )}
@@ -137,8 +137,8 @@ export function Sidebar({
           <ActionAreaList />
 
           <div className="location__panel">
-            <h4>Lokalizacja</h4>
-            <button onClick={onStartTracking}>Śledź lokalizacje</button>
+            <h4>Location</h4>
+            <button onClick={onStartTracking}>Track location</button>
             <button onClick={onStopTracking}>Stop</button>
             {isAdmin && (
               <button
@@ -153,21 +153,21 @@ export function Sidebar({
 
           <footer>
             <div>
-              Zalogowany jako <strong>{user?.username} </strong>
+              Logged in as <strong>{user?.username} </strong>
             </div>
 
             <button onClick={handleLogout} style={{ background: "#c45656ff" }}>
-              Wyloguj
+              Log out
             </button>
           </footer>
 
           {confirmClearTracks && (
             <div className="modal__overlay">
               <div className="modal">
-                <h2>Usunąć lokalizację?</h2>
+                <h2>Delete location?</h2>
                 <p>
-                  Ta operacja usunie z mapy
-                  <strong> wszystkie zapisane punkty lokalizacji</strong>{" "}
+                  This will remove
+                  <strong> all saved location points</strong> from the map
                 </p>
 
                 <div className="modal__actions">
@@ -179,11 +179,11 @@ export function Sidebar({
                       setConfirmClearTracks(false);
                     }}
                   >
-                    Usuń
+                    Delete
                   </button>
 
                   <button onClick={() => setConfirmClearTracks(false)}>
-                    Anuluj
+                    Cancel
                   </button>
                 </div>
               </div>

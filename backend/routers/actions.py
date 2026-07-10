@@ -1,11 +1,11 @@
 """
-Endpointy dla obszarów akcji (naganki).
+Endpoints for action areas (hunting drives).
 
-Zabezpieczone (wymagają JWT):
-  GET    /api/actions          – lista wszystkich akcji
-  POST   /api/actions          – nowa akcja (zalogowany user)
-  PUT    /api/actions/{id}     – edycja własnej akcji (zalogowany user)
-  DELETE /api/actions/{id}     – usunięcie akcji (tylko admin)  ← endpoint z rolą
+Secured (require JWT):
+  GET    /api/actions          – list all actions
+  POST   /api/actions          – create an action (any logged-in user)
+  PUT    /api/actions/{id}     – edit your own action (any logged-in user)
+  DELETE /api/actions/{id}     – delete an action (admin only)  ← role-gated endpoint
 """
 
 import uuid
@@ -22,7 +22,7 @@ from models import ActionArea, ActionPoint
 router = APIRouter(prefix="/api/actions", tags=["actions"])
 
 
-# ── Schematy Pydantic ──────────────────────────────────────────────────────
+# ── Pydantic schemas ──────────────────────────────────────────────────────
 
 class PointIn(BaseModel):
     lat: float
@@ -54,7 +54,7 @@ class ActionOut(BaseModel):
     model_config = {"from_attributes": True}
 
 
-# ── Helpery ────────────────────────────────────────────────────────────────
+# ── Helpers ────────────────────────────────────────────────────────────────
 
 def _to_out(action: ActionArea) -> ActionOut:
     return ActionOut(
@@ -67,14 +67,14 @@ def _to_out(action: ActionArea) -> ActionOut:
     )
 
 
-# ── Endpointy ──────────────────────────────────────────────────────────────
+# ── Endpoints ──────────────────────────────────────────────────────────────
 
 @router.get("", response_model=list[ActionOut])
 def list_actions(
     db: Session = Depends(get_db),
-    _user: dict = Depends(get_current_user),        # 🔒 wymaga JWT
+    _user: dict = Depends(get_current_user),        # 🔒 requires JWT
 ) -> Any:
-    """Pobierz wszystkie obszary akcji."""
+    """Fetch all action areas."""
     return [_to_out(a) for a in db.query(ActionArea).all()]
 
 
@@ -82,9 +82,9 @@ def list_actions(
 def create_action(
     body: ActionIn,
     db: Session = Depends(get_db),
-    user: dict = Depends(get_current_user),         # 🔒 wymaga JWT
+    user: dict = Depends(get_current_user),         # 🔒 requires JWT
 ) -> Any:
-    """Utwórz nowy obszar akcji."""
+    """Create a new action area."""
     action = ActionArea(
         id=str(uuid.uuid4()),
         name=body.name,
@@ -113,20 +113,20 @@ def update_action(
     action_id: str,
     body: ActionIn,
     db: Session = Depends(get_db),
-    user: dict = Depends(get_current_user),         # 🔒 wymaga JWT
+    user: dict = Depends(get_current_user),         # 🔒 requires JWT
 ) -> Any:
-    """Zaktualizuj obszar akcji (tylko własne)."""
+    """Update an action area (owner only)."""
     action = db.get(ActionArea, action_id)
     if action is None:
-        raise HTTPException(status_code=404, detail="Akcja nie znaleziona.")
+        raise HTTPException(status_code=404, detail="Action not found.")
     if action.created_by != user["sub"]:
-        raise HTTPException(status_code=403, detail="Mozesz edytowac tylko swoje akcje.")
+        raise HTTPException(status_code=403, detail="You can only edit your own actions.")
 
     action.name = body.name
     action.description = body.description
     action.group_id = body.group_id
 
-    # Zastap punkty
+    # Replace points
     for old in action.points:
         db.delete(old)
     db.flush()
@@ -147,11 +147,11 @@ def update_action(
 def delete_action(
     action_id: str,
     db: Session = Depends(get_db),
-    _admin: dict = Depends(require_admin),          # 🔒 wymaga roli ADMIN
+    _admin: dict = Depends(require_admin),          # 🔒 requires ADMIN role
 ) -> None:
-    """Usuń obszar akcji – tylko dla administratora."""
+    """Delete an action area – admin only."""
     action = db.get(ActionArea, action_id)
     if action is None:
-        raise HTTPException(status_code=404, detail="Akcja nie znaleziona.")
+        raise HTTPException(status_code=404, detail="Action not found.")
     db.delete(action)
     db.commit()

@@ -35,11 +35,11 @@ export function MainLayout() {
           <MapView />
         </div>
         <div className="map-info">
-          <strong>Panel informacyjny</strong>
+          <strong>Info panel</strong>
           <RouteInfo />
           {state.lastMapClick && (
             <div style={{ marginTop: 6 }}>
-              <div>Ostatnia interakcja z mapą:</div>
+              <div>Last map interaction:</div>
               <div>
                 lat: <strong>{state.lastMapClick.lat.toFixed(6)}</strong>
               </div>

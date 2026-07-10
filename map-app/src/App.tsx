@@ -7,7 +7,7 @@ export default function App() {
   const { isAuthenticated, isLoading } = useAuth();
 
   if (isLoading) {
-    return <div style={{ padding: "2rem" }}>Ładowanie...</div>;
+    return <div style={{ padding: "2rem" }}>Loading...</div>;
   }
 
   return (

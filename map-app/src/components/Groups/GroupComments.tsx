@@ -42,12 +42,12 @@ export function GroupComments({ groupId }: { groupId: string }) {
   return (
     <div style={{ marginTop: 10 }}>
       <div style={{ fontSize: "0.85rem", marginBottom: 4 }}>
-        <strong>Komentarze</strong>
+        <strong>Comments</strong>
       </div>
 
       {groupComments.length === 0 && (
         <div style={{ fontSize: "0.8rem", opacity: 0.8, marginBottom: 6 }}>
-          Brak komentarzy
+          No comments
         </div>
       )}
 
@@ -99,7 +99,7 @@ export function GroupComments({ groupId }: { groupId: string }) {
                     fontSize: "0.7rem",
                   }}
                 >
-                  Usuń
+                  Delete
                 </button>
               )}
             </div>
@@ -109,7 +109,7 @@ export function GroupComments({ groupId }: { groupId: string }) {
 
       <div style={{ display: "flex", gap: 4, marginTop: 4 }}>
         <input
-          placeholder="Dodaj komentarz"
+          placeholder="Add a comment"
           value={text}
           onChange={(e) => setText(e.target.value)}
           onKeyDown={(e) => {
@@ -118,7 +118,9 @@ export function GroupComments({ groupId }: { groupId: string }) {
           style={{ flex: 1 }}
         />
         <button onClick={handleAdd} disabled={!text.trim()}>
-          Wyślij
+          Send
         </button>
       </div>
-    </di
+    </div>
+  );
+}

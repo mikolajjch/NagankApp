@@ -1,4 +1,4 @@
-const R = 6371000; //promień ziemii w metrach
+const R = 6371000; // Earth's radius in meters
 
 export function haversineDistance(
   lat1: number,

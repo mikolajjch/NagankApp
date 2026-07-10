@@ -21,10 +21,10 @@ export function DrawnActionSave() {
 
   return (
     <div style={{ marginTop: 12 }}>
-      <h4>Rysuj nagankę na mapie</h4>
+      <h4>Draw a drive on the map</h4>
 
       <input
-        placeholder="Nazwa naganki"
+        placeholder="Drive name"
         value={name}
         onChange={(e) => setName(e.target.value)}
       />
@@ -34,7 +34,7 @@ export function DrawnActionSave() {
         disabled={!canSave}
         style={{ width: "100%" }}
       >
-        Zapisz rysowaną nagankę
+        Save drawn drive
       </button>
     </div>
   );

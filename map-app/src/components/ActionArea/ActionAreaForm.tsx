@@ -27,10 +27,10 @@ export function ActionAreaForm() {
 
   return (
     <form onSubmit={handleSubmit} style={{ marginBottom: 12 }}>
-      <h4>Wpisz współrzędne geograficzne</h4>
+      <h4>Enter geographic coordinates</h4>
 
       <input
-        placeholder="Nazwa naganki"
+        placeholder="Drive name"
         value={name}
         onChange={(e) => setName(e.target.value)}
         required
@@ -43,7 +43,7 @@ export function ActionAreaForm() {
         required
       />
 
-      <button type="submit">Dodaj</button>
+      <button type="submit">Add</button>
     </form>
   );
 }

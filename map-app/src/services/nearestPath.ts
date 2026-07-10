@@ -20,5 +20,5 @@ export function findNearestPoint(
   return nearest ? { point: nearest, distance: minDistance } : null;
 }
 
-// potem jakakolwiek część ścieżki albo rozbić ścieżkę na więcej punktów
+// later: any part of the route, or split the route into more points
 // ...........

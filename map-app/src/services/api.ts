@@ -1,6 +1,6 @@
 /**
- * Klient HTTP do backendu NagankApp.
- * Automatycznie dołącza JWT (Bearer token) do każdego zabezpieczonego żądania.
+ * HTTP client for the NagankApp backend.
+ * Automatically attaches a JWT (Bearer token) to every secured request.
  */
 
 const BASE_URL = import.meta.env.VITE_API_URL as string ?? "http://localhost:8000";
@@ -30,7 +30,7 @@ async function request<T>(
   return res.json() as Promise<T>;
 }
 
-// ── Typy ──────────────────────────────────────────────────────────────────
+// ── Types ─────────────────────────────────────────────────────────────────
 
 export interface ApiAction {
   id: string;
@@ -48,7 +48,7 @@ export interface ApiGroup {
   members: string[];
 }
 
-// ── Akcje ─────────────────────────────────────────────────────────────────
+// ── Actions ───────────────────────────────────────────────────────────────
 
 export const actionsApi = {
   list: (getToken: () => Promise<string>) =>
@@ -77,7 +77,7 @@ export const actionsApi = {
     request<void>(`/api/actions/${id}`, getToken, { method: "DELETE" }),
 };
 
-// ── Grupy ─────────────────────────────────────────────────────────────────
+// ── Groups ────────────────────────────────────────────────────────────────
 
 export const groupsApi = {
   list: (getToken: () => Promise<string>) =>
@@ -90,7 +90,7 @@ export const groupsApi = {
     }),
 };
 
-// ── Health (niezabezpieczony) ─────────────────────────────────────────────
+// ── Health (unsecured) ────────────────────────────────────────────────────
 
 export async function checkHealth(): Promise<{ status: string }> {
   const res = await fetch(`${BASE_URL}/health`);

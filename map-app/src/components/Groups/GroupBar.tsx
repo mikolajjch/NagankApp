@@ -54,7 +54,7 @@ export function GroupBar() {
       (g: Group) => g.name.toLowerCase() === trimmed.toLowerCase()
     );
     if (exists) {
-      setCreateError("Grupa o takiej nazwie już istnieje");
+      setCreateError("A group with this name already exists");
       return;
     }
 
@@ -104,9 +104,9 @@ export function GroupBar() {
         <button
           style={state.activeGroupId == null ? tabActive : tabBase}
           onClick={() => selectGroup(null)}
-          title="Naganki bez przypisanej grupy"
+          title="Drives without an assigned group"
         >
-          📂 Bez grupy
+          📂 No group
         </button>
 
         <button
@@ -115,7 +115,7 @@ export function GroupBar() {
             setCreating((v) => !v);
             setCreateError(null);
           }}
-          title="Utwórz nową grupę"
+          title="Create new group"
         >
           ➕
         </button>
@@ -124,7 +124,7 @@ export function GroupBar() {
       {creating && (
         <div style={{ display: "flex", gap: 4, marginBottom: 8 }}>
           <input
-            placeholder="Nazwa nowej grupy"
+            placeholder="New group name"
             value={newName}
             onChange={(e) => {
               setNewName(e.target.value);
@@ -136,7 +136,7 @@ export function GroupBar() {
             style={{ flex: 1 }}
           />
           <button onClick={handleCreate} disabled={!newName.trim()}>
-            Utwórz
+            Create
           </button>
         </div>
       )}
@@ -167,9 +167,9 @@ export function GroupBar() {
             </>
           ) : (
             <>
-              <div style={{ fontWeight: 600 }}>📂 Bez grupy</div>
+              <div style={{ fontWeight: 600 }}>📂 No group</div>
               <div style={{ fontSize: "0.75rem", opacity: 0.85 }}>
-                Naganki bez przypisanej grupy
+                Drives without an assigned group
               </div>
             </>
           )}
@@ -179,7 +179,7 @@ export function GroupBar() {
           <button
             onClick={() => setManageOpen((v) => !v)}
             style={{ fontSize: "0.8rem", padding: "5px 8px" }}
-            title="Zarządzaj grupą"
+            title="Manage group"
           >
             ⚙️ {manageOpen ? "▾" : "▸"}
           </button>
@@ -196,7 +196,7 @@ export function GroupBar() {
           }}
         >
           <div style={{ fontSize: "0.8rem", marginBottom: 6 }}>
-            <strong>Członkowie</strong>
+            <strong>Members</strong>
           </div>
 
           {activeGroup.members.map((m: string) => {
@@ -229,7 +229,7 @@ export function GroupBar() {
               }}
               style={{ marginTop: 8, width: "100%", background: "#c45656ff" }}
             >
-              🗑️ Usuń grupę
+              🗑️ Delete group
             </button>
           )}
         </div>

@@ -14,12 +14,12 @@ export function ActionAreaList() {
   );
 
   if (visibleActions.length === 0) {
-    return <p>Brak naganek w tej grupie</p>;
+    return <p>No drives in this group</p>;
   }
 
   return (
     <div className="action-area" style={{ marginBottom: 12 }}>
-      <h4>Naganki</h4>
+      <h4>Drives</h4>
       <div className="action-list">
         {visibleActions.map((action: any) => (
           <div
@@ -43,14 +43,14 @@ export function ActionAreaList() {
                   background: "transparent",
                   cursor: "pointer",
                 }}
-                title="Usuń nagankę"
+                title="Delete drive"
               >
                 ❌
               </button>
             )}
 
             {state.activeActionId === action.id ? (
-              <span style={{ marginLeft: 6 }}>(aktywna)</span>
+              <span style={{ marginLeft: 6 }}>(active)</span>
             ) : (
               <button
                 style={{ marginLeft: 6 }}
@@ -61,7 +61,7 @@ export function ActionAreaList() {
                   })
                 }
               >
-                Ustaw aktywną
+                Set active
               </button>
             )}
           </div>
@@ -70,10 +70,10 @@ export function ActionAreaList() {
       {confirmId && (
         <div className="modal__overlay">
           <div className="modal">
-            <h2>Usunąć "{actionToDelete?.name}"?</h2>
+            <h2>Delete "{actionToDelete?.name}"?</h2>
             <p>
-              Usunięcie naganki spowoduje również usunięcie przypisanych
-              ścieżek.
+              Deleting this drive will also delete its assigned
+              routes.
             </p>
 
             <div className="modal__actions">
@@ -83,10 +83,10 @@ export function ActionAreaList() {
                   setConfirmId(null);
                 }}
               >
-                Usuń
+                Delete
               </button>
 
-              <button onClick={() => setConfirmId(null)}>Anuluj</button>
+              <button onClick={() => setConfirmId(null)}>Cancel</button>
             </div>
           </div>
         </div>

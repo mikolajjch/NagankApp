@@ -39,4 +39,4 @@ class Group(Base):
     id = Column(String, primary_key=True, default=new_uuid)
     name = Column(String, nullable=False)
     created_by = Column(String, nullable=False)   # Auth0 user sub
-    members = Column(Text, default="")            # JSON lista userów
+    members = Column(Text, default="")            # JSON list of usernames

@@ -11,7 +11,7 @@ export function MapView() {
   const layersRef = useRef<L.LayerGroup | null>(null);
   const { state, dispatch } = useAppContext();
 
-  //inicjalizacja mapy
+  // map initialization
   useEffect(() => {
     if (mapRef.current) return;
 
@@ -28,13 +28,13 @@ export function MapView() {
     }, 0);
   }, []);
 
-  //glowna obsluga mapy
+  // main map handling
   useEffect(() => {
     if (!layersRef.current) return;
 
     layersRef.current.clearLayers();
 
-    // pokazujemy tylko obiekty z aktywnej grupy
+    // only show objects from the active group
     const visibleActions = state.actions.filter(
       (a: ActionArea) => (a.groupId ?? null) === state.activeGroupId
     );
@@ -106,7 +106,7 @@ export function MapView() {
       L.polyline(line, { color: "red" }).addTo(layersRef.current!);
     });
 
-    // tymczasowe rysowanie
+    // temporary drawing
     if (state.drawingPoints.length >= 2) {
       const temp = state.drawingPoints.map(
         (p: { lat: number; lng: number }) => [p.lat, p.lng]
@@ -125,7 +125,7 @@ export function MapView() {
       }
     }
 
-    /////////////////// obsługa ścieżki
+    /////////////////// route handling
     visibleRoutes.forEach((route: Route) => {
       if (route.points.length < 2) return;
 
@@ -151,7 +151,7 @@ export function MapView() {
       }).addTo(layersRef.current!);
     }
     ///////////////////
-    //// wektor do najbliższego punktu ścieżki
+    //// vector to the nearest route point
     const lastTrack = visibleTracks[visibleTracks.length - 1];
     const activeRoute = visibleRoutes.find(
       (r: Route) => r.actionId === state.activeActionId
@@ -193,7 +193,7 @@ export function MapView() {
     state.activeGroupId,
   ]);
 
-  //centrowanie przy zmianie aktywnej
+  // center the map when the active drive changes
   useEffect(() => {
     if (!mapRef.current) return;
     if (!state.activeActionId) return;

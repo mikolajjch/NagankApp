@@ -1,2 +1,2 @@
-// Zastapione przez GroupBar.tsx - plik do usuniecia (git rm).
+// Replaced by GroupBar.tsx - file to be removed (git rm).
 export {};

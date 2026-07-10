@@ -1,9 +1,9 @@
 """
-Endpointy dla grup myśliwskich.
+Endpoints for hunting groups.
 
-Zabezpieczone (wymagają JWT):
-  GET  /api/groups       – lista grup
-  POST /api/groups       – nowa grupa
+Secured (require JWT):
+  GET  /api/groups       – list groups
+  POST /api/groups       – create a group
 """
 
 import json
@@ -21,7 +21,7 @@ from models import Group
 router = APIRouter(prefix="/api/groups", tags=["groups"])
 
 
-# ── Schematy Pydantic ──────────────────────────────────────────────────────
+# ── Pydantic schemas ──────────────────────────────────────────────────────
 
 class GroupIn(BaseModel):
     name: str
@@ -36,7 +36,7 @@ class GroupOut(BaseModel):
     model_config = {"from_attributes": True}
 
 
-# ── Helpery ────────────────────────────────────────────────────────────────
+# ── Helpers ────────────────────────────────────────────────────────────────
 
 def _to_out(group: Group) -> GroupOut:
     members = json.loads(group.members) if group.members else []
@@ -48,14 +48,14 @@ def _to_out(group: Group) -> GroupOut:
     )
 
 
-# ── Endpointy ──────────────────────────────────────────────────────────────
+# ── Endpoints ──────────────────────────────────────────────────────────────
 
 @router.get("", response_model=list[GroupOut])
 def list_groups(
     db: Session = Depends(get_db),
-    _user: dict = Depends(get_current_user),    # 🔒 wymaga JWT
+    _user: dict = Depends(get_current_user),    # 🔒 requires JWT
 ) -> Any:
-    """Pobierz wszystkie grupy."""
+    """Fetch all groups."""
     return [_to_out(g) for g in db.query(Group).all()]
 
 
@@ -63,9 +63,9 @@ def list_groups(
 def create_group(
     body: GroupIn,
     db: Session = Depends(get_db),
-    user: dict = Depends(get_current_user),     # 🔒 wymaga JWT
+    user: dict = Depends(get_current_user),     # 🔒 requires JWT
 ) -> Any:
-    """Utwórz nową grupę."""
+    """Create a new group."""
     group = Group(
         id=str(uuid.uuid4()),
         name=body.name,

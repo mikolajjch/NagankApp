@@ -8,14 +8,14 @@ export function LoginPage() {
     <div className="login-page">
       <header>
         <h2>NagankApp</h2>
-        <p>Zaloguj się przez Auth0, aby kontynuować</p>
+        <p>Log in with Auth0 to continue</p>
       </header>
 
       <button
         className="login-btn"
         onClick={() => loginWithRedirect()}
       >
-        Zaloguj się
+        Log in
       </button>
     </div>
   );

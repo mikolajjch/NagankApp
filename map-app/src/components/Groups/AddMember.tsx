@@ -16,7 +16,7 @@ export function AddMember({ groupId }: { groupId: string }) {
   return (
     <div style={{ marginTop: 6 }}>
       <input
-        placeholder="nazwa użytkownika"
+        placeholder="username"
         value={username}
         onChange={(e) => setUsername(e.target.value)}
       />
@@ -25,7 +25,7 @@ export function AddMember({ groupId }: { groupId: string }) {
         onClick={() => {
           const name = username.trim();
           if (!name) return;
-          if (group.members.includes(name)) return; // 👈 ważne
+          if (group.members.includes(name)) return; // 👈 important
 
           dispatch({
             type: "ADD_GROUP_MEMBER",
@@ -35,7 +35,7 @@ export function AddMember({ groupId }: { groupId: string }) {
           setUsername("");
         }}
       >
-        Dodaj
+        Add
       </button>
     </div>
   );

@@ -1,15 +1,15 @@
 """
 OAuth 2.0 / JWT validation via Auth0.
 
-Jak dziala PKCE (Proof Key for Code Exchange):
-1. Frontend generuje losowy code_verifier i jego skrot SHA-256 (code_challenge).
-2. Frontend wysyla /authorize z code_challenge do Auth0.
-3. Auth0 zwraca authorization code do frontendu.
-4. Frontend wymienia code + code_verifier na token (POST /oauth/token).
-5. Auth0 weryfikuje ze SHA-256(code_verifier) == code_challenge z kroku 2.
-6. Jesli sie zgadza, zwraca access_token (JWT).
-7. Frontend dolacza JWT do kazdego requestu jako Bearer token.
-8. Backend (ten plik) weryfikuje podpis JWT uzywajac publicznego klucza Auth0 (JWKS).
+How PKCE (Proof Key for Code Exchange) works:
+1. The frontend generates a random code_verifier and its SHA-256 hash (code_challenge).
+2. The frontend sends code_challenge to Auth0's /authorize endpoint.
+3. Auth0 returns an authorization code to the frontend.
+4. The frontend exchanges code + code_verifier for a token (POST /oauth/token).
+5. Auth0 verifies that SHA-256(code_verifier) == code_challenge from step 2.
+6. If it matches, it returns an access_token (JWT).
+7. The frontend attaches the JWT to every request as a Bearer token.
+8. The backend (this file) verifies the JWT signature using Auth0's public key (JWKS).
 """
 
 import os
@@ -27,7 +27,7 @@ AUTH0_DOMAIN = os.getenv("AUTH0_DOMAIN", "")
 AUTH0_AUDIENCE = os.getenv("AUTH0_AUDIENCE", "")
 ALGORITHMS = ["RS256"]
 
-# Namespace dla custom claim z rolami (musi byc URL – wymog Auth0)
+# Namespace for the custom roles claim (must be a URL – Auth0 requirement)
 ROLES_CLAIM = "https://nagank-app.com/roles"
 
 bearer_scheme = HTTPBearer()
@@ -35,7 +35,7 @@ bearer_scheme = HTTPBearer()
 
 @lru_cache(maxsize=1)
 def _get_jwks() -> dict:
-    """Pobierz publiczne klucze Auth0 (cache na czas zycia procesu)."""
+    """Fetch Auth0's public keys (cached for the lifetime of the process)."""
     url = f"https://{AUTH0_DOMAIN}/.well-known/jwks.json"
     response = httpx.get(url, timeout=10)
     response.raise_for_status()
@@ -43,7 +43,7 @@ def _get_jwks() -> dict:
 
 
 def _decode_token(token: str) -> dict:
-    """Zdekoduj i zweryfikuj JWT."""
+    """Decode and verify a JWT."""
     try:
         jwks = _get_jwks()
         unverified_header = jwt.get_unverified_header(token)
@@ -58,7 +58,7 @@ def _decode_token(token: str) -> dict:
         if rsa_key is None:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Nie znaleziono klucza publicznego (kid mismatch).",
+                detail="Public key not found (kid mismatch).",
             )
 
         payload = jwt.decode(
@@ -73,33 +73,33 @@ def _decode_token(token: str) -> dict:
     except JWTError as exc:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=f"Nieprawidlowy token: {exc}",
+            detail=f"Invalid token: {exc}",
         ) from exc
 
 
 # ---------------------------------------------------------------------------
-# Dependency – dowolny zalogowany uzytkownik
+# Dependency – any authenticated user
 # ---------------------------------------------------------------------------
 
 def get_current_user(
     credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme),
 ) -> dict:
-    """Zwraca payload JWT dla kazdego uwierzytelnionego uzytkownika."""
+    """Returns the JWT payload for any authenticated user."""
     return _decode_token(credentials.credentials)
 
 
 # ---------------------------------------------------------------------------
-# Dependency – tylko admin
+# Dependency – admin only
 # ---------------------------------------------------------------------------
 
 def require_admin(
     payload: dict = Depends(get_current_user),
 ) -> dict:
-    """Wymaga roli 'admin' w custom claim JWT."""
+    """Requires the 'admin' role in the JWT custom claim."""
     roles: list[str] = payload.get(ROLES_CLAIM, [])
     if "admin" not in roles:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Brak uprawnien – wymagana rola admin.",
+            detail="Insufficient permissions – admin role required.",
         )
     return payload

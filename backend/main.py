@@ -1,14 +1,14 @@
 """
-NagankApp – backend FastAPI zabezpieczony OAuth 2.0 (Auth0).
+NagankApp – FastAPI backend secured with OAuth 2.0 (Auth0).
 
-Endpointy:
-  GET  /health               – NIEZABEZPIECZONY
-  GET  /api/actions          – zabezpieczony (JWT)
-  POST /api/actions          – zabezpieczony (JWT)
-  PUT  /api/actions/{id}     – zabezpieczony (JWT, tylko właściciel)
-  DELETE /api/actions/{id}   – zabezpieczony (JWT + rola admin)
-  GET  /api/groups           – zabezpieczony (JWT)
-  POST /api/groups           – zabezpieczony (JWT)
+Endpoints:
+  GET  /health               – UNSECURED
+  GET  /api/actions          – secured (JWT)
+  POST /api/actions          – secured (JWT)
+  PUT  /api/actions/{id}     – secured (JWT, owner only)
+  DELETE /api/actions/{id}   – secured (JWT + admin role)
+  GET  /api/groups           – secured (JWT)
+  POST /api/groups           – secured (JWT)
 """
 
 import os
@@ -22,16 +22,16 @@ from routers import actions, groups, health
 
 load_dotenv()
 
-# Utwórz tabele przy starcie (dev-mode; w produkcji użyj Alembic)
+# Create tables on startup (dev mode; use Alembic in production)
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title="NagankApp API",
-    description="Backend zabezpieczony OAuth 2.0 z Auth0 i PKCE",
+    description="Backend secured with OAuth 2.0 via Auth0 and PKCE",
     version="1.0.0",
 )
 
-# CORS – pozwól frontendowi (Vite dev server) na połączenie
+# CORS – allow the frontend (Vite dev server) to connect
 cors_origins = os.getenv("CORS_ORIGINS", "http://localhost:5173").split(",")
 app.add_middleware(
     CORSMiddleware,

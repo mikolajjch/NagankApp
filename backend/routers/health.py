@@ -5,5 +5,5 @@ router = APIRouter(tags=["health"])
 
 @router.get("/health")
 def health_check():
-    """Endpoint niezabezpieczony – sprawdzenie stanu API."""
+    """Unsecured endpoint – checks API status."""
     return {"status": "ok", "service": "nagank-backend"}
