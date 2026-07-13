@@ -7,7 +7,7 @@ import type { User } from "../types/User";
 import { useAuth } from "./AuthContext";
 
 // Namespace must match the Auth0 Action (backend auth.py uses the same one)
-const ROLES_CLAIM = "https://nagank-app.com/roles";
+const ROLES_CLAIM = "https://naganka-app.com/roles";
 
 export function useCurrentUser(): User | null {
   const { user, isAuthenticated } = useAuth();
