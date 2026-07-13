@@ -28,7 +28,7 @@ AUTH0_AUDIENCE = os.getenv("AUTH0_AUDIENCE", "")
 ALGORITHMS = ["RS256"]
 
 # Namespace for the custom roles claim (must be a URL – Auth0 requirement)
-ROLES_CLAIM = "https://nagank-app.com/roles"
+ROLES_CLAIM = "https://naganka-app.com/roles"
 
 bearer_scheme = HTTPBearer()
 

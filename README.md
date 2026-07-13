@@ -52,7 +52,7 @@ PKCE is an OAuth 2.0 extension designed for applications that cannot safely stor
 
 - Applications → APIs → Create API
 - Name: `NagankApp API`
-- Identifier (Audience): `https://nagank-api`
+- Identifier (Audience): `https://naganka-api`
 - Signing Algorithm: RS256
 
 ### 4. Add roles to the JWT (Auth0 Action)
@@ -61,7 +61,7 @@ Actions → Flows → Login → Add Action → **Build from scratch**
 
 ```javascript
 exports.onExecutePostLogin = async (event, api) => {
-  const namespace = 'https://nagank-app.com/roles';
+  const namespace = 'https://naganka-app.com/roles';
   const roles = event.authorization?.roles ?? [];
   api.idToken.setCustomClaim(namespace, roles);
   api.accessToken.setCustomClaim(namespace, roles);
