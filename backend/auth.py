@@ -103,3 +103,8 @@ def require_admin(
             detail="Insufficient permissions – admin role required.",
         )
     return payload
+
+
+def display_name(payload: dict) -> str:
+    """Best-effort human-readable name for a JWT payload (name, then email, then sub)."""
+    return payload.get("name") or payload.get("email") or payload["sub"]
