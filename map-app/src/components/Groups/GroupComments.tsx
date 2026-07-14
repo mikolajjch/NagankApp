@@ -1,41 +1,29 @@
 import { useState } from "react";
 import { useAppContext } from "../../context/AppContext";
 import { useCurrentUser } from "../../auth/useCurrentUser";
-import type { GroupComment } from "../../types/Group";
+import type { Group, GroupComment } from "../../types/Group";
 
 export function GroupComments({ groupId }: { groupId: string }) {
-  const { state, dispatch } = useAppContext();
+  const { state, api } = useAppContext();
   const user = useCurrentUser();
   const [text, setText] = useState("");
 
   if (!user) return null;
 
-  const groupComments = state.comments
-    .filter((c: GroupComment) => c.groupId === groupId)
-    .sort((a: GroupComment, b: GroupComment) => a.createdAt - b.createdAt);
+  const group = state.groups.find((g: Group) => g.id === groupId);
+  if (!group) return null;
+
+  const groupComments = [...group.comments].sort(
+    (a: GroupComment, b: GroupComment) => a.createdAt - b.createdAt
+  );
 
   const isAdmin = user.role === "admin";
 
-  const handleAdd = () => {
+  const handleAdd = async () => {
     const trimmed = text.trim();
     if (!trimmed) return;
 
-    dispatch({
-      type: "ADD_GROUP_COMMENT",
-      payload: {
-        id: crypto.randomUUID(),
-        groupId,
-        ownerId: user.username,
-        text: trimmed,
-        createdAt: Date.now(),
-      },
-    });
-
-    dispatch({
-      type: "INCREMENT_REPUTATION",
-      payload: { username: user.username, delta: 1 },
-    });
-
+    await api.addComment(groupId, trimmed);
     setText("");
   };
 
@@ -52,8 +40,8 @@ export function GroupComments({ groupId }: { groupId: string }) {
       )}
 
       {groupComments.map((c: GroupComment) => {
-        const rep = state.reputations[c.ownerId] ?? 0;
-        const canDelete = c.ownerId === user.username || isAdmin;
+        const rep = group.members.find((m) => m.sub === c.ownerSub)?.reputation ?? 0;
+        const canDelete = c.ownerSub === user.id || isAdmin;
 
         return (
           <div
@@ -73,7 +61,7 @@ export function GroupComments({ groupId }: { groupId: string }) {
                 gap: 6,
               }}
             >
-              <strong>{c.ownerId}</strong>
+              <strong>{c.ownerName}</strong>
               <span style={{ opacity: 0.8 }}>★ {rep}</span>
             </div>
             <div style={{ margin: "2px 0" }}>{c.text}</div>
@@ -88,12 +76,7 @@ export function GroupComments({ groupId }: { groupId: string }) {
               <span>{new Date(c.createdAt).toLocaleString()}</span>
               {canDelete && (
                 <button
-                  onClick={() =>
-                    dispatch({
-                      type: "DELETE_GROUP_COMMENT",
-                      payload: c.id,
-                    })
-                  }
+                  onClick={() => api.deleteComment(groupId, c.id)}
                   style={{
                     padding: "0 6px",
                     fontSize: "0.7rem",

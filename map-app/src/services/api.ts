@@ -41,11 +41,49 @@ export interface ApiAction {
   points: { lat: number; lng: number }[];
 }
 
+export interface ApiGroupMember {
+  sub: string;
+  display_name: string;
+  reputation: number;
+}
+
+export interface ApiGroupComment {
+  id: string;
+  owner_sub: string;
+  owner_name: string;
+  text: string;
+  created_at: number;
+}
+
 export interface ApiGroup {
   id: string;
   name: string;
   created_by: string;
-  members: string[];
+  members: ApiGroupMember[];
+  comments: ApiGroupComment[];
+}
+
+export interface ApiTrackPoint {
+  lat: number;
+  lng: number;
+  timestamp: number;
+  accuracy?: number | null;
+}
+
+export interface ApiTrack {
+  owner_sub: string;
+  points: ApiTrackPoint[];
+}
+
+export interface ApiRoutePoint {
+  lat: number;
+  lng: number;
+}
+
+export interface ApiRoute {
+  id: string;
+  owner_sub: string;
+  points: ApiRoutePoint[];
 }
 
 // ── Actions ───────────────────────────────────────────────────────────────
@@ -75,6 +113,35 @@ export const actionsApi = {
 
   delete: (getToken: () => Promise<string>, id: string) =>
     request<void>(`/api/actions/${id}`, getToken, { method: "DELETE" }),
+
+  getTracks: (getToken: () => Promise<string>, actionId: string) =>
+    request<ApiTrack[]>(`/api/actions/${actionId}/tracks`, getToken),
+
+  postTrackPoint: (
+    getToken: () => Promise<string>,
+    actionId: string,
+    point: ApiTrackPoint
+  ) =>
+    request<void>(`/api/actions/${actionId}/tracks/points`, getToken, {
+      method: "POST",
+      body: JSON.stringify(point),
+    }),
+
+  clearAllTracks: (getToken: () => Promise<string>) =>
+    request<void>("/api/actions/tracks", getToken, { method: "DELETE" }),
+
+  getRoutes: (getToken: () => Promise<string>, actionId: string) =>
+    request<ApiRoute[]>(`/api/actions/${actionId}/routes`, getToken),
+
+  saveRoute: (
+    getToken: () => Promise<string>,
+    actionId: string,
+    points: ApiRoutePoint[]
+  ) =>
+    request<ApiRoute>(`/api/actions/${actionId}/routes`, getToken, {
+      method: "POST",
+      body: JSON.stringify({ points }),
+    }),
 };
 
 // ── Groups ────────────────────────────────────────────────────────────────
@@ -87,6 +154,23 @@ export const groupsApi = {
     request<ApiGroup>("/api/groups", getToken, {
       method: "POST",
       body: JSON.stringify({ name }),
+    }),
+
+  delete: (getToken: () => Promise<string>, id: string) =>
+    request<void>(`/api/groups/${id}`, getToken, { method: "DELETE" }),
+
+  join: (getToken: () => Promise<string>, id: string) =>
+    request<ApiGroup>(`/api/groups/${id}/join`, getToken, { method: "POST" }),
+
+  addComment: (getToken: () => Promise<string>, groupId: string, text: string) =>
+    request<ApiGroupComment>(`/api/groups/${groupId}/comments`, getToken, {
+      method: "POST",
+      body: JSON.stringify({ text }),
+    }),
+
+  deleteComment: (getToken: () => Promise<string>, groupId: string, commentId: string) =>
+    request<void>(`/api/groups/${groupId}/comments/${commentId}`, getToken, {
+      method: "DELETE",
     }),
 };
 

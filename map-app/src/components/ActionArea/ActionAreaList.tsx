@@ -3,7 +3,7 @@ import { useCurrentUser } from "../../auth/useCurrentUser";
 import { useState } from "react";
 
 export function ActionAreaList() {
-  const { state, dispatch } = useAppContext();
+  const { state, dispatch, api } = useAppContext();
   const user = useCurrentUser();
   const isAdmin = user?.role === "admin";
   const [confirmId, setConfirmId] = useState<string | null>(null);
@@ -78,8 +78,8 @@ export function ActionAreaList() {
 
             <div className="modal__actions">
               <button
-                onClick={() => {
-                  dispatch({ type: "DELETE_ACTION", payload: confirmId });
+                onClick={async () => {
+                  await api.deleteAction(confirmId);
                   setConfirmId(null);
                 }}
               >

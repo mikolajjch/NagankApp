@@ -8,7 +8,5 @@ export interface ActionArea {
     lng: number;
   }[];
 
-  createdAt: string;
-
   groupId: string | null;
 }

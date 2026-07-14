@@ -24,7 +24,7 @@ export function Sidebar({
   onStartTracking,
   onStopTracking,
 }: Props) {
-  const { state, dispatch } = useAppContext();
+  const { state, dispatch, api } = useAppContext();
   const [drawMode, setDrawMode] = useState(false);
   const user = useCurrentUser();
   const isAdmin = user?.role === "admin";
@@ -118,7 +118,7 @@ export function Sidebar({
               <h4>Draw a route on the map</h4>
 
               <button
-                onClick={() => dispatch({ type: "SAVE_ROUTE" })}
+                onClick={() => api.saveRoute()}
                 disabled={state.routePoints.length < 2}
                 style={{ width: "100%" }}
               >
@@ -172,10 +172,8 @@ export function Sidebar({
 
                 <div className="modal__actions">
                   <button
-                    onClick={() => {
-                      state.tracks.forEach((t: any) =>
-                        dispatch({ type: "DELETE_TRACK", payload: t.id })
-                      );
+                    onClick={async () => {
+                      await api.clearAllTracks();
                       setConfirmClearTracks(false);
                     }}
                   >

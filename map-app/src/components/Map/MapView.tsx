@@ -9,7 +9,7 @@ import type { ActionArea } from "../../types/ActionArea";
 export function MapView() {
   const mapRef = useRef<L.Map | null>(null);
   const layersRef = useRef<L.LayerGroup | null>(null);
-  const { state, dispatch } = useAppContext();
+  const { state, dispatch, api } = useAppContext();
 
   // map initialization
   useEffect(() => {
@@ -77,13 +77,12 @@ export function MapView() {
                 lng: latlng.lng,
               };
 
-              dispatch({
-                type: "UPDATE_ACTION",
-                payload: {
-                  actionId: activeAction.id,
-                  area: newArea,
-                },
-              });
+              api.updateAction(
+                activeAction.id,
+                activeAction.name,
+                activeAction.description ?? "",
+                newArea
+              );
             });
           }
         );

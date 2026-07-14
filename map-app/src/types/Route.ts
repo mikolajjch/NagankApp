@@ -6,5 +6,6 @@ export interface RoutePoint {
 export interface Route {
   id: string;
   actionId: string;
+  ownerSub: string;
   points: RoutePoint[];
 }

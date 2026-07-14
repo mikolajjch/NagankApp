@@ -3,30 +3,23 @@ import { useAppContext } from "../context/AppContext";
 import { useAuth } from "../auth/AuthContext";
 
 export function useTracker() {
-  const { state, dispatch } = useAppContext();
+  const { state, api } = useAppContext();
   const { user } = useAuth();
   const watchId = useRef<number | null>(null);
 
   const startTracking = () => {
     if (!user || !state.activeActionId) {
-      console.warn("Brak usera lub aktywnej naganki");
+      console.warn("No user or active drive");
       return;
     }
 
     watchId.current = navigator.geolocation.watchPosition(
       (pos) => {
-        dispatch({
-          type: "ADD_TRACK_POINT",
-          payload: {
-            actionId: state.activeActionId,
-            userId: user.id,
-            point: {
-              lat: pos.coords.latitude,
-              lng: pos.coords.longitude,
-              timestamp: Date.now(),
-              accuracy: pos.coords.accuracy,
-            },
-          },
+        api.postTrackPoint({
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude,
+          timestamp: Date.now(),
+          accuracy: pos.coords.accuracy,
         });
       },
       (err) => console.error("GPS error", err),

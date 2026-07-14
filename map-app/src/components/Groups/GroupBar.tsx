@@ -1,7 +1,7 @@
 import { useState, type CSSProperties } from "react";
 import { useAppContext } from "../../context/AppContext";
 import { useCurrentUser } from "../../auth/useCurrentUser";
-import { AddMember } from "./AddMember";
+import { JoinGroup } from "./JoinGroup";
 import { GroupComments } from "./GroupComments";
 import type { Group } from "../../types/Group";
 
@@ -23,9 +23,10 @@ const tabActive: CSSProperties = {
 };
 
 export function GroupBar() {
-  const { state, dispatch } = useAppContext();
+  const { state, dispatch, api } = useAppContext();
   const user = useCurrentUser();
   const [manageOpen, setManageOpen] = useState(false);
+  const [browseOpen, setBrowseOpen] = useState(false);
   const [creating, setCreating] = useState(false);
   const [newName, setNewName] = useState("");
   const [createError, setCreateError] = useState<string | null>(null);
@@ -33,7 +34,7 @@ export function GroupBar() {
   if (!user) return null;
 
   const myGroups = state.groups.filter((g: Group) =>
-    g.members.includes(user.username)
+    g.members.some((m) => m.sub === user.id)
   );
 
   const activeGroup: Group | null =
@@ -46,7 +47,7 @@ export function GroupBar() {
     setManageOpen(false);
   };
 
-  const handleCreate = () => {
+  const handleCreate = async () => {
     const trimmed = newName.trim();
     if (!trimmed) return;
 
@@ -58,17 +59,7 @@ export function GroupBar() {
       return;
     }
 
-    const id = crypto.randomUUID();
-    dispatch({
-      type: "ADD_GROUP",
-      payload: {
-        id,
-        name: trimmed,
-        ownerId: user.username,
-        members: [user.username],
-        createdAt: Date.now(),
-      },
-    });
+    const id = await api.createGroup(trimmed);
     dispatch({ type: "SET_ACTIVE_GROUP", payload: id });
 
     setNewName("");
@@ -78,7 +69,7 @@ export function GroupBar() {
 
   const canManage =
     activeGroup != null &&
-    (activeGroup.ownerId === user.username || user.role === "admin");
+    (activeGroup.ownerId === user.id || user.role === "admin");
 
   return (
     <div style={{ marginBottom: 10 }}>
@@ -119,6 +110,14 @@ export function GroupBar() {
         >
           ➕
         </button>
+
+        <button
+          style={tabBase}
+          onClick={() => setBrowseOpen((v) => !v)}
+          title="Browse other groups to join"
+        >
+          🔎 Join a group
+        </button>
       </div>
 
       {creating && (
@@ -144,6 +143,19 @@ export function GroupBar() {
       {createError && (
         <div style={{ color: "#ffcccc", fontSize: "0.8rem", marginBottom: 6 }}>
           {createError}
+        </div>
+      )}
+
+      {browseOpen && (
+        <div
+          style={{
+            marginBottom: 8,
+            background: "rgba(255,255,255,0.08)",
+            borderRadius: 6,
+            padding: 8,
+          }}
+        >
+          <JoinGroup />
         </div>
       )}
 
@@ -199,32 +211,27 @@ export function GroupBar() {
             <strong>Members</strong>
           </div>
 
-          {activeGroup.members.map((m: string) => {
-            const rep = state.reputations[m] ?? 0;
-            return (
-              <div
-                key={m}
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  fontSize: "0.8rem",
-                  padding: "2px 0",
-                }}
-              >
-                <span>{m}</span>
-                <span style={{ opacity: 0.85 }}>★ {rep}</span>
-              </div>
-            );
-          })}
-
-          <AddMember groupId={activeGroup.id} />
+          {activeGroup.members.map((m) => (
+            <div
+              key={m.sub}
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                fontSize: "0.8rem",
+                padding: "2px 0",
+              }}
+            >
+              <span>{m.displayName}</span>
+              <span style={{ opacity: 0.85 }}>★ {m.reputation}</span>
+            </div>
+          ))}
 
           <GroupComments groupId={activeGroup.id} />
 
           {canManage && (
             <button
-              onClick={() => {
-                dispatch({ type: "DELETE_GROUP", payload: activeGroup.id });
+              onClick={async () => {
+                await api.deleteGroup(activeGroup.id);
                 setManageOpen(false);
               }}
               style={{ marginTop: 8, width: "100%", background: "#c45656ff" }}

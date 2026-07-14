@@ -1,239 +1,146 @@
-import React, { createContext, useContext, useEffect, useReducer } from "react";
+import React, { createContext, useCallback, useContext, useEffect, useReducer } from "react";
 import type { ActionArea } from "../types/ActionArea.ts";
 import type { Track, TrackPoint } from "../types/Track";
-import type { User } from "../types/User";
-import { loadAppState, saveAppState } from "../services/appStorage.ts";
-import type { Route } from "../types/Route.ts";
-import type { Group, GroupComment } from "../types/Group.ts";
+import type { Route, RoutePoint } from "../types/Route.ts";
+import type { Group } from "../types/Group.ts";
+import { useAuth } from "../auth/AuthContext";
+import {
+  actionsApi,
+  groupsApi,
+  type ApiAction,
+  type ApiGroup,
+  type ApiRoute,
+  type ApiTrack,
+} from "../services/api";
+
+// ── API → local type mapping ─────────────────────────────────────────────
+
+function apiActionToActionArea(a: ApiAction): ActionArea {
+  return {
+    id: a.id,
+    name: a.name,
+    description: a.description,
+    area: a.points,
+    groupId: a.group_id,
+  };
+}
+
+function apiGroupToGroup(g: ApiGroup): Group {
+  return {
+    id: g.id,
+    name: g.name,
+    ownerId: g.created_by,
+    members: g.members.map((m) => ({
+      sub: m.sub,
+      displayName: m.display_name,
+      reputation: m.reputation,
+    })),
+    comments: g.comments.map((c) => ({
+      id: c.id,
+      groupId: g.id,
+      ownerSub: c.owner_sub,
+      ownerName: c.owner_name,
+      text: c.text,
+      createdAt: c.created_at,
+    })),
+  };
+}
+
+function apiTrackToTrack(actionId: string, t: ApiTrack): Track {
+  return {
+    actionId,
+    ownerSub: t.owner_sub,
+    points: t.points.map((p) => ({
+      lat: p.lat,
+      lng: p.lng,
+      timestamp: p.timestamp,
+      accuracy: p.accuracy,
+    })),
+  };
+}
+
+function apiRouteToRoute(actionId: string, r: ApiRoute): Route {
+  return { id: r.id, actionId, ownerSub: r.owner_sub, points: r.points };
+}
+
+// ── State ─────────────────────────────────────────────────────────────────
 
 interface AppState {
-  user: User | null;
   actions: ActionArea[];
-  tracks: Track[];
+  groups: Group[];
+  tracks: Track[]; // tracks for the currently active action only
+  routes: Route[]; // routes for the currently active action only
+
   activeActionId: string | null;
   editActionMode: boolean;
 
   drawingPoints: { lat: number; lng: number }[];
   drawMode: boolean;
 
-  routes: Route[];
   routeDrawMode: boolean;
   routePoints: { lat: number; lng: number }[];
 
   lastMapClick: { lat: number; lng: number } | null;
 
-  groups: Group[];
   activeGroupId: string | null;
-  comments: GroupComment[];
-  reputations: Record<string, number>;
 }
 
 type Action =
   | { type: "ADD_DRAW_POINT"; payload: { lat: number; lng: number } }
   | { type: "CLEAR_DRAW_POINTS" }
-  ///////// naganki
-  | { type: "ADD_ACTION"; payload: ActionArea }
   | { type: "SET_ACTIVE_ACTION"; payload: string }
-  | {
-      type: "UPDATE_ACTION";
-      payload: {
-        actionId: string;
-        area: { lat: number; lng: number }[];
-      };
-    }
   | { type: "SET_EDIT_ACTION_MODE"; payload: boolean }
-  | { type: "DELETE_ACTION"; payload: string }
-  /////////////////
-  | {
-      type: "ADD_TRACK_POINT";
-      payload: { actionId: string; userId: string; point: TrackPoint };
-    }
   | { type: "SET_DRAW_MODE"; payload: boolean }
-  | { type: "DELETE_TRACK"; payload: string }
-  /////////////
   | { type: "SET_ROUTE_DRAW_MODE"; payload: boolean }
   | { type: "ADD_ROUTE_POINT"; payload: { lat: number; lng: number } }
   | { type: "CLEAR_ROUTE_POINTS" }
-  | { type: "SAVE_ROUTE" }
-  //
-  | {
-      type: "SET_LAST_MAP_CLICK";
-      payload: { lat: number; lng: number };
-    }
-  ////////////
-  | { type: "ADD_GROUP"; payload: Group }
-  | { type: "DELETE_GROUP"; payload: string }
+  | { type: "SET_LAST_MAP_CLICK"; payload: { lat: number; lng: number } }
   | { type: "SET_ACTIVE_GROUP"; payload: string | null }
-  | {
-      type: "ADD_GROUP_MEMBER";
-      payload: { groupId: string; username: string };
-    }
-  ////////////
-  | { type: "ADD_GROUP_COMMENT"; payload: GroupComment }
-  | { type: "DELETE_GROUP_COMMENT"; payload: string }
-  | {
-      type: "INCREMENT_REPUTATION";
-      payload: { username: string; delta: number };
-    };
+  | { type: "SET_ACTIONS"; payload: ActionArea[] }
+  | { type: "SET_GROUPS"; payload: Group[] }
+  | { type: "SET_TRACKS"; payload: Track[] }
+  | { type: "SET_ROUTES"; payload: Route[] };
 
-const persisted = loadAppState();
 const initialState: AppState = {
-  user: null,
-  actions: persisted?.actions ?? [],
-  tracks: persisted?.tracks ?? [],
-  activeActionId: persisted?.activeActionId ?? null,
+  actions: [],
+  groups: [],
+  tracks: [],
+  routes: [],
+
+  activeActionId: null,
   editActionMode: false,
 
   drawingPoints: [],
   drawMode: false,
 
-  routes: persisted?.routes ?? [],
   routeDrawMode: false,
   routePoints: [],
 
   lastMapClick: null,
 
-  groups: persisted?.groups ?? [],
-  activeGroupId: persisted?.activeGroupId ?? null,
-  comments: persisted?.comments ?? [],
-  reputations: persisted?.reputations ?? {},
+  activeGroupId: null,
 };
 
 function reducer(state: AppState, action: Action): AppState {
   switch (action.type) {
     case "ADD_DRAW_POINT":
-      return {
-        ...state,
-        drawingPoints: [...state.drawingPoints, action.payload],
-      };
+      return { ...state, drawingPoints: [...state.drawingPoints, action.payload] };
     case "CLEAR_DRAW_POINTS":
-      return {
-        ...state,
-        drawingPoints: [],
-      };
-    case "ADD_ACTION":
-      return {
-        ...state,
-        actions: [
-          ...state.actions,
-          { ...action.payload, groupId: state.activeGroupId },
-        ],
-      };
-
+      return { ...state, drawingPoints: [] };
     case "SET_ACTIVE_ACTION":
       return { ...state, activeActionId: action.payload };
-    case "UPDATE_ACTION":
-      return {
-        ...state,
-        actions: state.actions.map((a) =>
-          a.id === action.payload.actionId
-            ? { ...a, area: action.payload.area }
-            : a
-        ),
-      };
     case "SET_EDIT_ACTION_MODE":
       return { ...state, editActionMode: action.payload };
-
-    case "DELETE_ACTION": {
-      const del_id = action.payload;
-      return {
-        ...state,
-        actions: state.actions.filter((a) => a.id != del_id),
-        routes: state.routes.filter((r) => r.actionId != del_id),
-        activeActionId:
-          state.activeActionId == del_id ? null : state.activeActionId,
-      };
-    }
     case "SET_DRAW_MODE":
-      return {
-        ...state,
-        drawMode: action.payload,
-      };
-    case "ADD_TRACK_POINT": {
-      const { actionId, userId, point } = action.payload;
-
-      const existing = state.tracks.find(
-        (t) => t.actionId === actionId && t.userId === userId
-      );
-
-      if (existing) {
-        return {
-          ...state,
-          tracks: state.tracks.map((t) =>
-            t === existing ? { ...t, points: [...t.points, point] } : t
-          ),
-        };
-      }
-
-      return {
-        ...state,
-        tracks: [
-          ...state.tracks,
-          {
-            id: crypto.randomUUID(),
-            actionId,
-            userId,
-            points: [point],
-          },
-        ],
-      };
-    }
-    case "DELETE_TRACK":
-      return {
-        ...state,
-        tracks: state.tracks.filter((t) => t.id !== action.payload),
-      };
-
-    ///////////////////////////////// logika sciezki do przejscia
+      return { ...state, drawMode: action.payload };
     case "SET_ROUTE_DRAW_MODE":
       return { ...state, routeDrawMode: action.payload };
     case "ADD_ROUTE_POINT":
-      return {
-        ...state,
-        routePoints: [...state.routePoints, action.payload],
-      };
+      return { ...state, routePoints: [...state.routePoints, action.payload] };
     case "CLEAR_ROUTE_POINTS":
       return { ...state, routePoints: [] };
-    case "SAVE_ROUTE":
-      if (!state.activeActionId || state.routePoints.length < 2) return state;
-      return {
-        ...state,
-        routes: [
-          ...state.routes,
-          {
-            id: crypto.randomUUID(),
-            actionId: state.activeActionId,
-            points: state.routePoints,
-          },
-        ],
-        routePoints: [],
-        routeDrawMode: false,
-      };
-    /////////////////////////////////////
     case "SET_LAST_MAP_CLICK":
-      return {
-        ...state,
-        lastMapClick: action.payload,
-      };
-    /////////////////////////////////////
-    case "ADD_GROUP":
-      return {
-        ...state,
-        groups: [...state.groups, action.payload],
-      };
-    case "DELETE_GROUP": {
-      const gid = action.payload;
-      return {
-        ...state,
-        groups: state.groups.filter((g) => g.id !== gid),
-        actions: state.actions.map((a) =>
-          a.groupId === gid ? { ...a, groupId: null } : a
-        ),
-        activeGroupId:
-          state.activeGroupId === gid ? null : state.activeGroupId,
-      };
-    }
-
+      return { ...state, lastMapClick: action.payload };
     case "SET_ACTIVE_GROUP":
       return {
         ...state,
@@ -241,79 +148,182 @@ function reducer(state: AppState, action: Action): AppState {
         activeActionId: null,
         editActionMode: false,
       };
-
-    case "ADD_GROUP_MEMBER":
-      return {
-        ...state,
-        groups: state.groups.map((g) =>
-          g.id === action.payload.groupId &&
-          !g.members.includes(action.payload.username)
-            ? { ...g, members: [...g.members, action.payload.username] }
-            : g
-        ),
-      };
-
-    ///////////////////////////////// komentarze i reputacja
-    case "ADD_GROUP_COMMENT":
-      return {
-        ...state,
-        comments: [...state.comments, action.payload],
-      };
-
-    case "DELETE_GROUP_COMMENT":
-      return {
-        ...state,
-        comments: state.comments.filter((c) => c.id !== action.payload),
-      };
-
-    case "INCREMENT_REPUTATION": {
-      const { username, delta } = action.payload;
-      const current = state.reputations[username] ?? 0;
-      return {
-        ...state,
-        reputations: { ...state.reputations, [username]: current + delta },
-      };
-    }
-
+    case "SET_ACTIONS":
+      return { ...state, actions: action.payload };
+    case "SET_GROUPS":
+      return { ...state, groups: action.payload };
+    case "SET_TRACKS":
+      return { ...state, tracks: action.payload };
+    case "SET_ROUTES":
+      return { ...state, routes: action.payload };
     default:
       return state;
   }
 }
 
-const AppContext = createContext<any>(null);
+// ── Context ───────────────────────────────────────────────────────────────
 
-export const AppProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
+interface AppApi {
+  createAction: (name: string, description: string, area: { lat: number; lng: number }[]) => Promise<string>;
+  updateAction: (actionId: string, name: string, description: string, area: { lat: number; lng: number }[]) => Promise<void>;
+  deleteAction: (actionId: string) => Promise<void>;
+  createGroup: (name: string) => Promise<string>;
+  deleteGroup: (groupId: string) => Promise<void>;
+  joinGroup: (groupId: string) => Promise<void>;
+  addComment: (groupId: string, text: string) => Promise<void>;
+  deleteComment: (groupId: string, commentId: string) => Promise<void>;
+  postTrackPoint: (point: Omit<TrackPoint, "accuracy"> & { accuracy?: number | null }) => Promise<void>;
+  clearAllTracks: () => Promise<void>;
+  saveRoute: () => Promise<void>;
+}
+
+const AppContext = createContext<{
+  state: AppState;
+  dispatch: React.Dispatch<Action>;
+  api: AppApi;
+} | null>(null);
+
+export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [state, dispatch] = useReducer(reducer, initialState);
+  const { isAuthenticated, getAccessTokenSilently } = useAuth();
+  const getToken = useCallback(() => getAccessTokenSilently(), [getAccessTokenSilently]);
 
+  const refreshActions = useCallback(async () => {
+    const list = await actionsApi.list(getToken);
+    dispatch({ type: "SET_ACTIONS", payload: list.map(apiActionToActionArea) });
+  }, [getToken]);
+
+  const refreshGroups = useCallback(async () => {
+    const list = await groupsApi.list(getToken);
+    dispatch({ type: "SET_GROUPS", payload: list.map(apiGroupToGroup) });
+  }, [getToken]);
+
+  const refreshTracks = useCallback(
+    async (actionId: string) => {
+      const list = await actionsApi.getTracks(getToken, actionId);
+      dispatch({ type: "SET_TRACKS", payload: list.map((t) => apiTrackToTrack(actionId, t)) });
+    },
+    [getToken]
+  );
+
+  const refreshRoutes = useCallback(
+    async (actionId: string) => {
+      const list = await actionsApi.getRoutes(getToken, actionId);
+      dispatch({ type: "SET_ROUTES", payload: list.map((r) => apiRouteToRoute(actionId, r)) });
+    },
+    [getToken]
+  );
+
+  // Poll shared data (actions + groups) while logged in
   useEffect(() => {
-    saveAppState({
-      actions: state.actions,
-      tracks: state.tracks,
-      activeActionId: state.activeActionId,
-      activeGroupId: state.activeGroupId,
-      routes: state.routes,
-      groups: state.groups,
-      comments: state.comments,
-      reputations: state.reputations,
-    });
-  }, [
-    state.actions,
-    state.tracks,
-    state.activeActionId,
-    state.activeGroupId,
-    state.routes,
-    state.groups,
-    state.comments,
-    state.reputations,
-  ]);
+    if (!isAuthenticated) return;
+    refreshActions();
+    refreshGroups();
+    const interval = setInterval(() => {
+      refreshActions();
+      refreshGroups();
+    }, 10000);
+    return () => clearInterval(interval);
+  }, [isAuthenticated, refreshActions, refreshGroups]);
+
+  // Poll tracks (near-real-time positions) while an action is active
+  useEffect(() => {
+    if (!isAuthenticated || !state.activeActionId) {
+      dispatch({ type: "SET_TRACKS", payload: [] });
+      dispatch({ type: "SET_ROUTES", payload: [] });
+      return;
+    }
+    const actionId = state.activeActionId;
+    refreshTracks(actionId);
+    refreshRoutes(actionId);
+    const interval = setInterval(() => refreshTracks(actionId), 5000);
+    return () => clearInterval(interval);
+  }, [isAuthenticated, state.activeActionId, refreshTracks, refreshRoutes]);
+
+  const api: AppApi = {
+    createAction: async (name, description, area) => {
+      const created = await actionsApi.create(getToken, {
+        name,
+        description,
+        group_id: state.activeGroupId ?? undefined,
+        points: area,
+      });
+      await refreshActions();
+      return created.id;
+    },
+
+    updateAction: async (actionId, name, description, area) => {
+      const current = state.actions.find((a) => a.id === actionId);
+      await actionsApi.update(getToken, actionId, {
+        name,
+        description,
+        group_id: current?.groupId ?? undefined,
+        points: area,
+      });
+      await refreshActions();
+    },
+
+    deleteAction: async (actionId) => {
+      await actionsApi.delete(getToken, actionId);
+      await refreshActions();
+    },
+
+    createGroup: async (name) => {
+      const created = await groupsApi.create(getToken, name);
+      await refreshGroups();
+      return created.id;
+    },
+
+    deleteGroup: async (groupId) => {
+      await groupsApi.delete(getToken, groupId);
+      await refreshGroups();
+    },
+
+    joinGroup: async (groupId) => {
+      await groupsApi.join(getToken, groupId);
+      await refreshGroups();
+    },
+
+    addComment: async (groupId, text) => {
+      await groupsApi.addComment(getToken, groupId, text);
+      await refreshGroups();
+    },
+
+    deleteComment: async (groupId, commentId) => {
+      await groupsApi.deleteComment(getToken, groupId, commentId);
+      await refreshGroups();
+    },
+
+    postTrackPoint: async (point) => {
+      if (!state.activeActionId) return;
+      await actionsApi.postTrackPoint(getToken, state.activeActionId, point);
+      await refreshTracks(state.activeActionId);
+    },
+
+    clearAllTracks: async () => {
+      await actionsApi.clearAllTracks(getToken);
+      if (state.activeActionId) await refreshTracks(state.activeActionId);
+    },
+
+    saveRoute: async () => {
+      if (!state.activeActionId || state.routePoints.length < 2) return;
+      const points: RoutePoint[] = state.routePoints;
+      await actionsApi.saveRoute(getToken, state.activeActionId, points);
+      dispatch({ type: "CLEAR_ROUTE_POINTS" });
+      dispatch({ type: "SET_ROUTE_DRAW_MODE", payload: false });
+      await refreshRoutes(state.activeActionId);
+    },
+  };
 
   return (
-    <AppContext.Provider value={{ state, dispatch }}>
+    <AppContext.Provider value={{ state, dispatch, api }}>
       {children}
     </AppContext.Provider>
   );
 };
 
-export const useAppContext = () => useContext(AppContext);
+export const useAppContext = () => {
+  const ctx = useContext(AppContext);
+  if (!ctx) throw new Error("useAppContext must be used inside AppProvider");
+  return ctx;
+};

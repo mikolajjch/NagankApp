@@ -1,14 +1,13 @@
 import { useState } from "react";
 import { useAppContext } from "../../context/AppContext";
-import { createActionArea } from "../../services/actionFactory";
 
 export function ActionAreaForm() {
-  const { dispatch } = useAppContext();
+  const { dispatch, api } = useAppContext();
 
   const [name, setName] = useState("");
   const [points, setPoints] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     // format: lat,lng;lat,lng;lat,lng...
@@ -17,9 +16,8 @@ export function ActionAreaForm() {
       return { lat, lng };
     });
 
-    const action = createActionArea(name, area);
-    dispatch({ type: "ADD_ACTION", payload: action });
-    dispatch({ type: "SET_ACTIVE_ACTION", payload: action.id });
+    const actionId = await api.createAction(name, "", area);
+    dispatch({ type: "SET_ACTIVE_ACTION", payload: actionId });
 
     setName("");
     setPoints("");

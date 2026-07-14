@@ -2,12 +2,11 @@ export interface TrackPoint {
     lat: number;
     lng: number;
     timestamp: number;
-    accuracy?: number;
+    accuracy?: number | null;
 }
 
 export interface Track {
-    id: string;
     actionId: string;
-    userId: string;
+    ownerSub: string;
     points: TrackPoint[];
 }
