@@ -13,20 +13,22 @@ export function RouteInfo() {
   /// (for all points of all routes)
   ///const allRoutePoints = state.routes.flatMap((r) => r.points);
 
+  const lastTrack = state.tracks[state.tracks.length - 1];
+  const userPos = lastTrack?.points[lastTrack.points.length - 1];
+
+  // Hooks must run unconditionally on every render, so this stays above any early return.
+  const nearest = useMemo(() => {
+    if (!activeRoute || !userPos) return null;
+    return findNearestPoint(userPos.lat, userPos.lng, activeRoute.points);
+  }, [activeRoute, userPos]);
+
   if (!activeRoute) {
     return <div>No active route</div>;
   }
 
-  const lastTrack = state.tracks[state.tracks.length - 1];
   if (!lastTrack || lastTrack.points.length === 0) {
     return <div>No user position</div>;
   }
-
-  const userPos = lastTrack.points[lastTrack.points.length - 1];
-
-  const nearest = useMemo(() => {
-    return findNearestPoint(userPos.lat, userPos.lng, activeRoute.points);
-  }, [userPos.lat, userPos.lng, activeRoute.points]);
 
   if (!nearest) {
     return <div>Route point not found</div>;
