@@ -212,7 +212,12 @@ export function MapView() {
       padding: [30, 30],
       animate: true,
     });
-  }, [state.activeActionId, state.actions]);
+    // Intentionally re-fit only when the active drive itself changes, not on
+    // every actions poll refresh (state.actions gets a new reference every
+    // ~10s) — otherwise the map keeps snapping back while the user is
+    // drawing something else.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.activeActionId]);
 
   useEffect(() => {
     if (!mapRef.current) return;
