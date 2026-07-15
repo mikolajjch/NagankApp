@@ -22,7 +22,7 @@ from sqlalchemy.orm import Session
 
 from auth import get_current_user, require_admin
 from database import get_db
-from models import ActionArea, ActionPoint, Route, RoutePoint, Track, TrackPoint
+from models import ActionArea, ActionPoint, GroupMembership, Route, RoutePoint, Track, TrackPoint
 
 router = APIRouter(prefix="/api/actions", tags=["actions"])
 
@@ -120,10 +120,23 @@ def _get_action_or_404(action_id: str, db: Session) -> ActionArea:
 @router.get("", response_model=list[ActionOut])
 def list_actions(
     db: Session = Depends(get_db),
-    _user: dict = Depends(get_current_user),        # 🔒 requires JWT
+    user: dict = Depends(get_current_user),          # 🔒 requires JWT
 ) -> Any:
-    """Fetch all action areas."""
-    return [_to_out(a) for a in db.query(ActionArea).all()]
+    """Fetch action areas visible to the current user: their own ungrouped
+    actions, plus actions belonging to groups they are a member of."""
+    my_group_ids = {
+        m.group_id
+        for m in db.query(GroupMembership)
+        .filter(GroupMembership.user_sub == user["sub"])
+        .all()
+    }
+    visible = [
+        a
+        for a in db.query(ActionArea).all()
+        if (a.group_id is None and a.created_by == user["sub"])
+        or (a.group_id is not None and a.group_id in my_group_ids)
+    ]
+    return [_to_out(a) for a in visible]
 
 
 @router.post("", response_model=ActionOut, status_code=status.HTTP_201_CREATED)
